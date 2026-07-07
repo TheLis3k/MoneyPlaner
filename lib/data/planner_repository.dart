@@ -1,0 +1,149 @@
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import '../models/models.dart';
+import '../models/category_progress.dart';
+import 'database_helper.dart';
+
+/// Single entry point for all persistence: periods, categories, splits and
+/// expenses. Keeps SQL out of the UI/state layers.
+class PlannerRepository {
+  PlannerRepository({DatabaseHelper? helper})
+      : _helper = helper ?? DatabaseHelper.instance;
+
+  final DatabaseHelper _helper;
+
+  Future<Database> get _db async => _helper.database;
+
+  // ---------------------------------------------------------------- categories
+
+  Future<List<Category>> getCategories() async {
+    final db = await _db;
+    final rows = await db.query('categories', orderBy: 'name COLLATE NOCASE');
+    return rows.map(Category.fromMap).toList();
+  }
+
+  Future<int> insertCategory(Category category) async {
+    final db = await _db;
+    return db.insert('categories', category.toMap()..remove('id'));
+  }
+
+  Future<void> updateCategory(Category category) async {
+    final db = await _db;
+    await db.update('categories', category.toMap(),
+        where: 'id = ?', whereArgs: [category.id]);
+  }
+
+  /// Populates a starter set of categories the first time the app runs, so a
+  /// new user has something to split their income across immediately.
+  Future<void> seedDefaultCategoriesIfEmpty() async {
+    final db = await _db;
+    final rows = await db.rawQuery('SELECT COUNT(*) AS n FROM categories');
+    final count = (rows.first['n'] as int?) ?? 0;
+    if (count > 0) return;
+
+    const defaults = <Category>[
+      Category(name: 'Rent', color: '#5C6BC0', icon: 'home'),
+      Category(name: 'Food', color: '#66BB6A', icon: 'restaurant'),
+      Category(name: 'Transport', color: '#FFA726', icon: 'directions_bus'),
+      Category(name: 'Savings', color: '#26A69A', icon: 'savings'),
+      Category(name: 'Fun', color: '#EC407A', icon: 'celebration'),
+    ];
+    final batch = db.batch();
+    for (final c in defaults) {
+      batch.insert('categories', c.toMap()..remove('id'));
+    }
+    await batch.commit(noResult: true);
+  }
+
+  // ------------------------------------------------------------------- periods
+
+  Future<List<Period>> getPeriods() async {
+    final db = await _db;
+    final rows = await db.query('periods', orderBy: 'start_date DESC');
+    return rows.map(Period.fromMap).toList();
+  }
+
+  /// The most recent period by start date, or null if none exist yet.
+  Future<Period?> getCurrentPeriod() async {
+    final db = await _db;
+    final rows =
+        await db.query('periods', orderBy: 'start_date DESC', limit: 1);
+    return rows.isEmpty ? null : Period.fromMap(rows.first);
+  }
+
+  Future<int> insertPeriod(Period period) async {
+    final db = await _db;
+    return db.insert('periods', period.toMap()..remove('id'));
+  }
+
+  // -------------------------------------------------------------------- splits
+
+  Future<List<Split>> getSplitsForPeriod(int periodId) async {
+    final db = await _db;
+    final rows = await db
+        .query('splits', where: 'period_id = ?', whereArgs: [periodId]);
+    return rows.map(Split.fromMap).toList();
+  }
+
+  Future<int> insertSplit(Split split) async {
+    final db = await _db;
+    return db.insert('splits', split.toMap()..remove('id'));
+  }
+
+  Future<void> deleteSplit(int splitId) async {
+    final db = await _db;
+    await db.delete('splits', where: 'id = ?', whereArgs: [splitId]);
+  }
+
+  // ------------------------------------------------------------------ expenses
+
+  Future<int> insertExpense(Expense expense) async {
+    final db = await _db;
+    return db.insert('expenses', expense.toMap()..remove('id'));
+  }
+
+  Future<List<Expense>> getExpensesForSplit(int splitId) async {
+    final db = await _db;
+    final rows = await db.query('expenses',
+        where: 'split_id = ?', whereArgs: [splitId], orderBy: 'date DESC');
+    return rows.map(Expense.fromMap).toList();
+  }
+
+  /// Total spent per split id across a whole period, in one grouped query.
+  Future<Map<int, double>> spentBySplit(int periodId) async {
+    final db = await _db;
+    final rows = await db.rawQuery('''
+      SELECT e.split_id AS split_id, SUM(e.amount) AS total
+      FROM expenses e
+      JOIN splits s ON s.id = e.split_id
+      WHERE s.period_id = ?
+      GROUP BY e.split_id
+    ''', [periodId]);
+
+    return {
+      for (final row in rows)
+        row['split_id'] as int: (row['total'] as num).toDouble(),
+    };
+  }
+
+  // ----------------------------------------------------------------- aggregate
+
+  /// Assembles the per-category planned/spent/remaining view for a period.
+  Future<List<CategoryProgress>> categoryProgress(int periodId) async {
+    final splits = await getSplitsForPeriod(periodId);
+    if (splits.isEmpty) return const [];
+
+    final categories = {for (final c in await getCategories()) c.id: c};
+    final spent = await spentBySplit(periodId);
+
+    return [
+      for (final split in splits)
+        if (categories[split.categoryId] != null)
+          CategoryProgress(
+            category: categories[split.categoryId]!,
+            split: split,
+            spent: spent[split.id] ?? 0,
+          ),
+    ];
+  }
+}
