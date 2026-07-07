@@ -1,0 +1,148 @@
+<div align="center">
+
+# 💰 Money Planner
+
+**An envelope-budgeting app that helps you _plan_ your money — not just track it.**
+
+Plan your income across categories at the start of each period, then watch
+*planned vs. spent vs. remaining* update as you log real spending.
+
+[![Flutter](https://img.shields.io/badge/Flutter-3.44-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.12-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+[![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20iOS%20%7C%20Windows-informational)](#)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+</div>
+
+---
+
+## ✨ The idea
+
+Most finance apps are *trackers* — they tell you where your money went after it's
+gone. Money Planner is a **planner**. It's built around **envelope budgeting**:
+
+1. **Enter your income** for a period (e.g. July 2026).
+2. **Split** that income across categories — Rent, Food, Savings, Fun… Each
+   category is a virtual *envelope* you fill up front.
+3. As the period goes on, **log spending** against each envelope.
+4. See, per category and overall: **planned vs. spent vs. remaining** — with charts.
+
+Delete a category mid-period? Its unspent allocation flows back into an
+**Unallocated** pool, ready to re-split — while its past expenses stay on record
+so your history is never distorted.
+
+## 🎯 Features
+
+| | |
+|---|---|
+| 🧧 **Envelope budgeting** | Allocate income to categories; spend against the plan |
+| 📊 **Visual insight** | Pie chart of your split, progress bars for spent-vs-planned, spending-over-time line charts |
+| 🔁 **Recurring rules** | Templates for regular income/expenses (rent, salary) that pre-fill new periods |
+| 🧮 **Unallocated tracking** | Always know how much income is still free to assign |
+| 📌 **Persistent balance bar** | Remaining balance stays visible on every screen |
+| 🕓 **History** | Read-only summaries and charts for past periods |
+| 🔐 **Local security** | PIN + biometric unlock (`local_auth`) |
+| ☁️ **Encrypted sync** | Push an **AES-encrypted** blob to a private GitHub repo — the cloud only ever sees ciphertext |
+
+## 🏗️ Architecture
+
+A clean, layered structure that keeps domain, data, and UI separate:
+
+```
+lib/
+├── main.dart                 # Entry point — boots the SQLite database
+├── app.dart                  # MaterialApp: theming + routing
+├── models/                   # Domain entities (pure Dart, no Flutter deps)
+│   ├── period.dart
+│   ├── category.dart
+│   ├── split.dart            # the "plan": income → category allocation
+│   ├── expense.dart
+│   └── recurring_rule.dart
+├── data/
+│   └── database_helper.dart  # SQLite schema + connection (sqflite / ffi)
+├── theme/
+│   └── app_theme.dart        # Light & dark Material 3 themes
+├── widgets/
+│   └── remaining_balance_bar.dart   # shared sticky balance bar
+└── screens/
+    └── dashboard/            # current-period overview
+```
+
+### Data model
+
+Five tables in SQLite, wired with foreign keys:
+
+- **`periods`** — one row per planning period, holds total income
+- **`categories`** — reusable envelopes (Rent, Food, …), with color + icon
+- **`splits`** — the plan: how much of a period's income each category gets
+- **`expenses`** — actual spending logged against a split
+- **`recurring_rules`** — templates for repeating income/expenses
+
+Expenses deliberately outlive their split so historical periods stay accurate
+even after a category is removed.
+
+## 🔒 Security model
+
+- **Unlock** — biometric via `local_auth`, with a PIN fallback stored as a
+  **salted hash** (never plaintext).
+- **Sync** — data is exported to JSON, **encrypted with AES** (key derived from
+  the PIN via PBKDF2), and only then pushed to GitHub as `data.enc`. The remote
+  never sees anything but ciphertext.
+- **Tokens** — the GitHub token lives in `flutter_secure_storage`, never in
+  source. Local database files and secrets are `.gitignore`d.
+
+## 🛠️ Tech stack
+
+| Concern | Package |
+|---|---|
+| Local database | `sqflite` (+ `sqflite_common_ffi` for desktop) |
+| Charts | `fl_chart` |
+| State management | `provider` |
+| HTTP / GitHub API | `http` |
+| Encryption | `encrypt`, `crypto` |
+| Secure token storage | `flutter_secure_storage` |
+| Biometric / PIN | `local_auth` |
+| Date & currency formatting | `intl` |
+
+## 🚀 Getting started
+
+**Prerequisites:** [Flutter](https://docs.flutter.dev/get-started/install) 3.44+
+(bundles Dart 3.12).
+
+```bash
+git clone https://github.com/TheLis3k/money-planner.git
+cd money-planner
+flutter pub get
+flutter run          # pick a device, or -d windows / -d chrome
+```
+
+Run the checks:
+
+```bash
+flutter analyze
+flutter test
+```
+
+> **Windows note:** running the app on the Windows desktop target requires
+> [Developer Mode](https://learn.microsoft.com/windows/apps/get-started/enable-your-device-for-development)
+> enabled (for plugin symlink support). Android/iOS builds need Android
+> Studio / Xcode set up respectively.
+
+## 🗺️ Roadmap
+
+- [x] **Phase 0** — Project scaffold, data model, SQLite schema
+- [ ] **Phase 1** — New Period & Add Expense screens, numeric dashboard
+- [ ] **Phase 2** — Charts (pie split, spent-vs-planned bars, spending line)
+- [ ] **Phase 3** — Recurring rules + auto-generated expenses
+- [ ] **Phase 4** — PIN + biometric lock screen
+- [ ] **Phase 5** — Encrypted GitHub sync (push/pull `data.enc`)
+- [ ] **Phase 6** — History view, category management, edge-case polish
+
+## 🤝 Contributing
+
+This is a personal/portfolio project, but issues and suggestions are welcome —
+open an issue to start a conversation.
+
+## 📄 License
+
+Released under the [MIT License](LICENSE).
