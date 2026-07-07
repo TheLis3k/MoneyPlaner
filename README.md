@@ -110,8 +110,8 @@ even after a category is removed.
 (bundles Dart 3.12).
 
 ```bash
-git clone https://github.com/TheLis3k/money-planner.git
-cd money-planner
+git clone https://github.com/TheLis3k/MoneyPlaner.git
+cd MoneyPlaner
 flutter pub get
 flutter run          # pick a device, or -d windows / -d chrome
 ```
