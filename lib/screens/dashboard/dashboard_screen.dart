@@ -12,6 +12,8 @@ import '../add_expense/add_expense_screen.dart';
 import '../categories/categories_screen.dart';
 import '../category_detail/category_detail_screen.dart';
 import '../period_setup/new_period_screen.dart';
+import 'widgets/planned_pie_chart.dart';
+import 'widgets/planned_vs_spent_chart.dart';
 
 /// Home screen — current-period overview with planned vs. spent per category.
 class DashboardScreen extends StatelessWidget {
@@ -144,6 +146,12 @@ class _PeriodView extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         _SummaryCard(state: state),
+        if (state.progress.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          PlannedPieChart(progress: state.progress),
+          const SizedBox(height: 16),
+          PlannedVsSpentChart(progress: state.progress),
+        ],
         const SizedBox(height: 16),
         Text(l10n.envelopes, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),

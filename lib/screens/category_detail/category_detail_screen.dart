@@ -8,6 +8,7 @@ import '../../models/expense.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
+import 'widgets/spending_line_chart.dart';
 
 /// Detail for a single envelope: planned/spent/remaining plus the list of
 /// expenses logged against it, each of which can be deleted.
@@ -34,19 +35,9 @@ class CategoryDetailScreen extends StatelessWidget {
         children: [
           _Header(progress: progress),
           const Divider(height: 1),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                l10n.expenses,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-          ),
           Expanded(
             child: FutureBuilder<List<Expense>>(
-              // Keyed on spent so the list re-queries after add/delete.
+              // Keyed on spent so the data re-queries after add/delete.
               key: ValueKey(progress.spent),
               future: state.expensesForSplit(splitId),
               builder: (context, snapshot) {
@@ -54,16 +45,28 @@ class CategoryDetailScreen extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 }
                 final expenses = snapshot.data!;
-                if (expenses.isEmpty) {
-                  return Center(child: Text(l10n.noExpenses));
-                }
-                return ListView.separated(
-                  itemCount: expenses.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, i) => _ExpenseTile(
-                    expense: expenses[i],
-                    color: progress.category.displayColor,
-                  ),
+                final color = progress.category.displayColor;
+                return ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    SpendingLineChart(expenses: expenses, color: color),
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.expenses,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    if (expenses.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Center(child: Text(l10n.noExpenses)),
+                      )
+                    else
+                      for (var i = 0; i < expenses.length; i++) ...[
+                        _ExpenseTile(expense: expenses[i], color: color),
+                        if (i < expenses.length - 1) const Divider(height: 1),
+                      ],
+                  ],
                 );
               },
             ),

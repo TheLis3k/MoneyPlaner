@@ -409,6 +409,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expense deleted'**
   String get expenseDeleted;
+
+  /// No description provided for @plannedSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned split'**
+  String get plannedSplit;
+
+  /// No description provided for @plannedVsSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned vs. spent'**
+  String get plannedVsSpent;
+
+  /// No description provided for @spendingOverTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending over time'**
+  String get spendingOverTime;
+
+  /// No description provided for @notEnoughData.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough data yet.'**
+  String get notEnoughData;
 }
 
 class _AppLocalizationsDelegate

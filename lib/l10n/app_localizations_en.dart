@@ -176,4 +176,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get expenseDeleted => 'Expense deleted';
+
+  @override
+  String get plannedSplit => 'Planned split';
+
+  @override
+  String get plannedVsSpent => 'Planned vs. spent';
+
+  @override
+  String get spendingOverTime => 'Spending over time';
+
+  @override
+  String get notEnoughData => 'Not enough data yet.';
 }

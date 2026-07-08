@@ -74,5 +74,10 @@
     "placeholders": { "amount": { "type": "String" } }
   },
   "cancel": "Cancel",
-  "expenseDeleted": "Expense deleted"
+  "expenseDeleted": "Expense deleted",
+
+  "plannedSplit": "Planned split",
+  "plannedVsSpent": "Planned vs. spent",
+  "spendingOverTime": "Spending over time",
+  "notEnoughData": "Not enough data yet."
 }

@@ -59,5 +59,10 @@
   "deleteExpense": "Usuń wydatek",
   "deleteExpenseConfirm": "Usunąć ten wydatek na {amount}?",
   "cancel": "Anuluj",
-  "expenseDeleted": "Wydatek usunięty"
+  "expenseDeleted": "Wydatek usunięty",
+
+  "plannedSplit": "Podział planu",
+  "plannedVsSpent": "Plan a wydatki",
+  "spendingOverTime": "Wydatki w czasie",
+  "notEnoughData": "Za mało danych."
 }

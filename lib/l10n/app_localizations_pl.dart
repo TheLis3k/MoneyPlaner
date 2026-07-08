@@ -175,4 +175,16 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get expenseDeleted => 'Wydatek usunięty';
+
+  @override
+  String get plannedSplit => 'Podział planu';
+
+  @override
+  String get plannedVsSpent => 'Plan a wydatki';
+
+  @override
+  String get spendingOverTime => 'Wydatki w czasie';
+
+  @override
+  String get notEnoughData => 'Za mało danych.';
 }
