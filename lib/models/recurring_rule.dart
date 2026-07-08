@@ -46,20 +46,20 @@ class RecurringRule {
   }
 
   factory RecurringRule.fromMap(Map<String, Object?> map) => RecurringRule(
-        id: map['id'] as int?,
-        categoryId: map['category_id'] as int,
-        amount: (map['amount'] as num).toDouble(),
-        frequency: RecurrenceFrequency.fromName(map['frequency'] as String),
-        note: map['note'] as String?,
-        active: (map['active'] as int) == 1,
-      );
+    id: map['id'] as int?,
+    categoryId: map['category_id'] as int,
+    amount: (map['amount'] as num).toDouble(),
+    frequency: RecurrenceFrequency.fromName(map['frequency'] as String),
+    note: map['note'] as String?,
+    active: (map['active'] as int) == 1,
+  );
 
   Map<String, Object?> toMap() => {
-        'id': id,
-        'category_id': categoryId,
-        'amount': amount,
-        'frequency': frequency.name,
-        'note': note,
-        'active': active ? 1 : 0,
-      };
+    'id': id,
+    'category_id': categoryId,
+    'amount': amount,
+    'frequency': frequency.name,
+    'note': note,
+    'active': active ? 1 : 0,
+  };
 }

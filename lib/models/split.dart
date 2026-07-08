@@ -30,16 +30,16 @@ class Split {
   }
 
   factory Split.fromMap(Map<String, Object?> map) => Split(
-        id: map['id'] as int?,
-        periodId: map['period_id'] as int,
-        categoryId: map['category_id'] as int,
-        plannedAmount: (map['planned_amount'] as num).toDouble(),
-      );
+    id: map['id'] as int?,
+    periodId: map['period_id'] as int,
+    categoryId: map['category_id'] as int,
+    plannedAmount: (map['planned_amount'] as num).toDouble(),
+  );
 
   Map<String, Object?> toMap() => {
-        'id': id,
-        'period_id': periodId,
-        'category_id': categoryId,
-        'planned_amount': plannedAmount,
-      };
+    'id': id,
+    'period_id': periodId,
+    'category_id': categoryId,
+    'planned_amount': plannedAmount,
+  };
 }

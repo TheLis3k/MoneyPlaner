@@ -11,12 +11,7 @@ class Category {
   /// Optional icon key, resolved to a [IconData] in the UI layer.
   final String? icon;
 
-  const Category({
-    this.id,
-    required this.name,
-    required this.color,
-    this.icon,
-  });
+  const Category({this.id, required this.name, required this.color, this.icon});
 
   Category copyWith({int? id, String? name, String? color, String? icon}) {
     return Category(
@@ -28,16 +23,16 @@ class Category {
   }
 
   factory Category.fromMap(Map<String, Object?> map) => Category(
-        id: map['id'] as int?,
-        name: map['name'] as String,
-        color: map['color'] as String,
-        icon: map['icon'] as String?,
-      );
+    id: map['id'] as int?,
+    name: map['name'] as String,
+    color: map['color'] as String,
+    icon: map['icon'] as String?,
+  );
 
   Map<String, Object?> toMap() => {
-        'id': id,
-        'name': name,
-        'color': color,
-        'icon': icon,
-      };
+    'id': id,
+    'name': name,
+    'color': color,
+    'icon': icon,
+  };
 }

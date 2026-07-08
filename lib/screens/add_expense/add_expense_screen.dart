@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../models/category_progress.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
+import '../../util/money_format.dart';
 
 /// Log a real expense against one of the current period's envelopes.
 class AddExpenseScreen extends StatefulWidget {
@@ -36,31 +38,30 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
     setState(() => _saving = true);
     await context.read<PlannerState>().addExpense(
-          splitId: _splitId!,
-          amount: double.parse(_amountController.text.trim()),
-          date: _date,
-          note: _noteController.text.trim().isEmpty
-              ? null
-              : _noteController.text.trim(),
-        );
+      splitId: _splitId!,
+      amount: double.parse(_amountController.text.trim().replaceAll(',', '.')),
+      date: _date,
+      note: _noteController.text.trim().isEmpty
+          ? null
+          : _noteController.text.trim(),
+    );
     if (mounted) Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final progress = context.watch<PlannerState>().progress;
-    final dateFmt = DateFormat.yMMMd();
-    final currency = NumberFormat.simpleCurrency();
+    final dateFmt = DateFormat.yMMMd('pl');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Add expense')),
+      appBar: AppBar(title: Text(l10n.addExpense)),
       body: progress.isEmpty
-          ? const Center(
+          ? Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.all(24),
                 child: Text(
-                  'This period has no envelopes yet. Add categories to the '
-                  'period before logging expenses.',
+                  l10n.noEnvelopesForExpense,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -73,35 +74,36 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   DropdownButtonFormField<int>(
                     initialValue: _splitId,
                     isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Envelope',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.envelope,
+                      border: const OutlineInputBorder(),
                     ),
                     items: [
                       for (final p in progress)
                         DropdownMenuItem(
                           value: p.split.id,
-                          child: _EnvelopeItem(progress: p, currency: currency),
+                          child: _EnvelopeItem(progress: p),
                         ),
                     ],
                     onChanged: (v) => setState(() => _splitId = v),
-                    validator: (v) => v == null ? 'Pick an envelope' : null,
+                    validator: (v) => v == null ? l10n.pickEnvelope : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _amountController,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(
-                      labelText: 'Amount',
-                      prefixIcon: Icon(Icons.attach_money),
-                      border: OutlineInputBorder(),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: l10n.amount,
+                      suffixText: 'zł',
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (v) {
-                      final value = double.tryParse((v ?? '').trim());
-                      if (value == null || value <= 0) {
-                        return 'Enter an amount';
-                      }
+                      final value = double.tryParse(
+                        (v ?? '').trim().replaceAll(',', '.'),
+                      );
+                      if (value == null || value <= 0) return l10n.enterAmount;
                       return null;
                     },
                   ),
@@ -117,9 +119,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       if (picked != null) setState(() => _date = picked);
                     },
                     child: InputDecorator(
-                      decoration: const InputDecoration(
-                        labelText: 'Date',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.date,
+                        border: const OutlineInputBorder(),
                       ),
                       child: Text(dateFmt.format(_date)),
                     ),
@@ -127,9 +129,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _noteController,
-                    decoration: const InputDecoration(
-                      labelText: 'Note (optional)',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.noteOptional,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -139,9 +141,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2))
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
                         : const Icon(Icons.check),
-                    label: const Text('Save expense'),
+                    label: Text(l10n.saveExpense),
                   ),
                 ],
               ),
@@ -151,20 +154,25 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 }
 
 class _EnvelopeItem extends StatelessWidget {
-  const _EnvelopeItem({required this.progress, required this.currency});
+  const _EnvelopeItem({required this.progress});
   final CategoryProgress progress;
-  final NumberFormat currency;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
-        Icon(progress.category.displayIcon,
-            size: 18, color: progress.category.displayColor),
+        Icon(
+          progress.category.displayIcon,
+          size: 18,
+          color: progress.category.displayColor,
+        ),
         const SizedBox(width: 8),
         Expanded(child: Text(progress.category.name)),
-        Text('${currency.format(progress.remaining)} left',
-            style: Theme.of(context).textTheme.bodySmall),
+        Text(
+          l10n.amountLeft(formatZloty(progress.remaining)),
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       ],
     );
   }

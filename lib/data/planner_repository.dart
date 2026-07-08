@@ -8,7 +8,7 @@ import 'database_helper.dart';
 /// expenses. Keeps SQL out of the UI/state layers.
 class PlannerRepository {
   PlannerRepository({DatabaseHelper? helper})
-      : _helper = helper ?? DatabaseHelper.instance;
+    : _helper = helper ?? DatabaseHelper.instance;
 
   final DatabaseHelper _helper;
 
@@ -29,30 +29,27 @@ class PlannerRepository {
 
   Future<void> updateCategory(Category category) async {
     final db = await _db;
-    await db.update('categories', category.toMap(),
-        where: 'id = ?', whereArgs: [category.id]);
+    await db.update(
+      'categories',
+      category.toMap(),
+      where: 'id = ?',
+      whereArgs: [category.id],
+    );
   }
 
-  /// Populates a starter set of categories the first time the app runs, so a
-  /// new user has something to split their income across immediately.
-  Future<void> seedDefaultCategoriesIfEmpty() async {
+  /// Whether a category is referenced by any split (in any period).
+  Future<bool> isCategoryInUse(int categoryId) async {
     final db = await _db;
-    final rows = await db.rawQuery('SELECT COUNT(*) AS n FROM categories');
-    final count = (rows.first['n'] as int?) ?? 0;
-    if (count > 0) return;
+    final rows = await db.rawQuery(
+      'SELECT COUNT(*) AS n FROM splits WHERE category_id = ?',
+      [categoryId],
+    );
+    return ((rows.first['n'] as int?) ?? 0) > 0;
+  }
 
-    const defaults = <Category>[
-      Category(name: 'Rent', color: '#5C6BC0', icon: 'home'),
-      Category(name: 'Food', color: '#66BB6A', icon: 'restaurant'),
-      Category(name: 'Transport', color: '#FFA726', icon: 'directions_bus'),
-      Category(name: 'Savings', color: '#26A69A', icon: 'savings'),
-      Category(name: 'Fun', color: '#EC407A', icon: 'celebration'),
-    ];
-    final batch = db.batch();
-    for (final c in defaults) {
-      batch.insert('categories', c.toMap()..remove('id'));
-    }
-    await batch.commit(noResult: true);
+  Future<void> deleteCategory(int categoryId) async {
+    final db = await _db;
+    await db.delete('categories', where: 'id = ?', whereArgs: [categoryId]);
   }
 
   // ------------------------------------------------------------------- periods
@@ -66,8 +63,11 @@ class PlannerRepository {
   /// The most recent period by start date, or null if none exist yet.
   Future<Period?> getCurrentPeriod() async {
     final db = await _db;
-    final rows =
-        await db.query('periods', orderBy: 'start_date DESC', limit: 1);
+    final rows = await db.query(
+      'periods',
+      orderBy: 'start_date DESC',
+      limit: 1,
+    );
     return rows.isEmpty ? null : Period.fromMap(rows.first);
   }
 
@@ -80,8 +80,11 @@ class PlannerRepository {
 
   Future<List<Split>> getSplitsForPeriod(int periodId) async {
     final db = await _db;
-    final rows = await db
-        .query('splits', where: 'period_id = ?', whereArgs: [periodId]);
+    final rows = await db.query(
+      'splits',
+      where: 'period_id = ?',
+      whereArgs: [periodId],
+    );
     return rows.map(Split.fromMap).toList();
   }
 
@@ -104,21 +107,33 @@ class PlannerRepository {
 
   Future<List<Expense>> getExpensesForSplit(int splitId) async {
     final db = await _db;
-    final rows = await db.query('expenses',
-        where: 'split_id = ?', whereArgs: [splitId], orderBy: 'date DESC');
+    final rows = await db.query(
+      'expenses',
+      where: 'split_id = ?',
+      whereArgs: [splitId],
+      orderBy: 'date DESC',
+    );
     return rows.map(Expense.fromMap).toList();
+  }
+
+  Future<void> deleteExpense(int expenseId) async {
+    final db = await _db;
+    await db.delete('expenses', where: 'id = ?', whereArgs: [expenseId]);
   }
 
   /// Total spent per split id across a whole period, in one grouped query.
   Future<Map<int, double>> spentBySplit(int periodId) async {
     final db = await _db;
-    final rows = await db.rawQuery('''
+    final rows = await db.rawQuery(
+      '''
       SELECT e.split_id AS split_id, SUM(e.amount) AS total
       FROM expenses e
       JOIN splits s ON s.id = e.split_id
       WHERE s.period_id = ?
       GROUP BY e.split_id
-    ''', [periodId]);
+    ''',
+      [periodId],
+    );
 
     return {
       for (final row in rows)

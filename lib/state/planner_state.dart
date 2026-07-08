@@ -11,7 +11,7 @@ import '../models/category_progress.dart';
 /// remaining, unallocated).
 class PlannerState extends ChangeNotifier {
   PlannerState({PlannerRepository? repository})
-      : _repo = repository ?? PlannerRepository();
+    : _repo = repository ?? PlannerRepository();
 
   final PlannerRepository _repo;
 
@@ -20,6 +20,9 @@ class PlannerState extends ChangeNotifier {
 
   Period? _currentPeriod;
   Period? get currentPeriod => _currentPeriod;
+
+  List<Period> _periods = const [];
+  List<Period> get periods => _periods;
 
   List<Category> _categories = const [];
   List<Category> get categories => _categories;
@@ -31,8 +34,7 @@ class PlannerState extends ChangeNotifier {
 
   double get income => _currentPeriod?.income ?? 0;
 
-  double get totalPlanned =>
-      _progress.fold(0, (sum, p) => sum + p.planned);
+  double get totalPlanned => _progress.fold(0, (sum, p) => sum + p.planned);
 
   double get totalSpent => _progress.fold(0, (sum, p) => sum + p.spent);
 
@@ -50,12 +52,21 @@ class PlannerState extends ChangeNotifier {
     _loading = true;
     notifyListeners();
 
-    await _repo.seedDefaultCategoriesIfEmpty();
     _categories = await _repo.getCategories();
-    _currentPeriod = await _repo.getCurrentPeriod();
+    _periods = await _repo.getPeriods();
+    _currentPeriod = _periods.isNotEmpty ? _periods.first : null;
     await _refreshProgress();
 
     _loading = false;
+    notifyListeners();
+  }
+
+  /// Switch the dashboard to another existing period.
+  Future<void> selectPeriod(int periodId) async {
+    final match = _periods.where((p) => p.id == periodId);
+    if (match.isEmpty || match.first.id == _currentPeriod?.id) return;
+    _currentPeriod = match.first;
+    await _refreshProgress();
     notifyListeners();
   }
 
@@ -76,22 +87,27 @@ class PlannerState extends ChangeNotifier {
     required double income,
     required Map<int, double> plannedByCategory,
   }) async {
-    final periodId = await _repo.insertPeriod(Period(
-      name: name,
-      startDate: startDate,
-      endDate: endDate,
-      income: income,
-    ));
+    final periodId = await _repo.insertPeriod(
+      Period(
+        name: name,
+        startDate: startDate,
+        endDate: endDate,
+        income: income,
+      ),
+    );
 
     for (final entry in plannedByCategory.entries) {
       if (entry.value <= 0) continue;
-      await _repo.insertSplit(Split(
-        periodId: periodId,
-        categoryId: entry.key,
-        plannedAmount: entry.value,
-      ));
+      await _repo.insertSplit(
+        Split(
+          periodId: periodId,
+          categoryId: entry.key,
+          plannedAmount: entry.value,
+        ),
+      );
     }
 
+    _periods = await _repo.getPeriods();
     _currentPeriod = await _repo.getCurrentPeriod();
     await _refreshProgress();
     notifyListeners();
@@ -103,12 +119,18 @@ class PlannerState extends ChangeNotifier {
     required DateTime date,
     String? note,
   }) async {
-    await _repo.insertExpense(Expense(
-      splitId: splitId,
-      amount: amount,
-      date: date,
-      note: note,
-    ));
+    await _repo.insertExpense(
+      Expense(splitId: splitId, amount: amount, date: date, note: note),
+    );
+    await _refreshProgress();
+    notifyListeners();
+  }
+
+  Future<List<Expense>> expensesForSplit(int splitId) =>
+      _repo.getExpensesForSplit(splitId);
+
+  Future<void> deleteExpense(int expenseId) async {
+    await _repo.deleteExpense(expenseId);
     await _refreshProgress();
     notifyListeners();
   }
@@ -117,5 +139,22 @@ class PlannerState extends ChangeNotifier {
     await _repo.insertCategory(category);
     _categories = await _repo.getCategories();
     notifyListeners();
+  }
+
+  Future<void> updateCategory(Category category) async {
+    await _repo.updateCategory(category);
+    _categories = await _repo.getCategories();
+    await _refreshProgress();
+    notifyListeners();
+  }
+
+  /// Removes a category, refusing if it's still referenced by a split.
+  /// Returns true on success, false if the category is in use.
+  Future<bool> deleteCategory(int categoryId) async {
+    if (await _repo.isCategoryInUse(categoryId)) return false;
+    await _repo.deleteCategory(categoryId);
+    _categories = await _repo.getCategories();
+    notifyListeners();
+    return true;
   }
 }

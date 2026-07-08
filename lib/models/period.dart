@@ -34,18 +34,18 @@ class Period {
   }
 
   factory Period.fromMap(Map<String, Object?> map) => Period(
-        id: map['id'] as int?,
-        name: map['name'] as String,
-        startDate: DateTime.parse(map['start_date'] as String),
-        endDate: DateTime.parse(map['end_date'] as String),
-        income: (map['income'] as num).toDouble(),
-      );
+    id: map['id'] as int?,
+    name: map['name'] as String,
+    startDate: DateTime.parse(map['start_date'] as String),
+    endDate: DateTime.parse(map['end_date'] as String),
+    income: (map['income'] as num).toDouble(),
+  );
 
   Map<String, Object?> toMap() => {
-        'id': id,
-        'name': name,
-        'start_date': startDate.toIso8601String(),
-        'end_date': endDate.toIso8601String(),
-        'income': income,
-      };
+    'id': id,
+    'name': name,
+    'start_date': startDate.toIso8601String(),
+    'end_date': endDate.toIso8601String(),
+    'income': income,
+  };
 }

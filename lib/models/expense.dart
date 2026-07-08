@@ -40,20 +40,20 @@ class Expense {
   }
 
   factory Expense.fromMap(Map<String, Object?> map) => Expense(
-        id: map['id'] as int?,
-        splitId: map['split_id'] as int,
-        amount: (map['amount'] as num).toDouble(),
-        date: DateTime.parse(map['date'] as String),
-        note: map['note'] as String?,
-        recurringId: map['recurring_id'] as int?,
-      );
+    id: map['id'] as int?,
+    splitId: map['split_id'] as int,
+    amount: (map['amount'] as num).toDouble(),
+    date: DateTime.parse(map['date'] as String),
+    note: map['note'] as String?,
+    recurringId: map['recurring_id'] as int?,
+  );
 
   Map<String, Object?> toMap() => {
-        'id': id,
-        'split_id': splitId,
-        'amount': amount,
-        'date': date.toIso8601String(),
-        'note': note,
-        'recurring_id': recurringId,
-      };
+    'id': id,
+    'split_id': splitId,
+    'amount': amount,
+    'date': date.toIso8601String(),
+    'note': note,
+    'recurring_id': recurringId,
+  };
 }

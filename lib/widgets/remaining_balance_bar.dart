@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
+import '../l10n/app_localizations.dart';
+import '../util/money_format.dart';
 
 /// Slim sticky bar showing the current period's remaining balance.
 ///
@@ -17,8 +19,8 @@ class RemainingBalanceBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final currency = NumberFormat.simpleCurrency();
     final isNegative = remaining < 0;
     final bg = isNegative ? scheme.errorContainer : scheme.primaryContainer;
     final fg = isNegative ? scheme.onErrorContainer : scheme.onPrimaryContainer;
@@ -34,12 +36,14 @@ class RemainingBalanceBar extends StatelessWidget {
               Icon(Icons.account_balance_wallet_outlined, size: 20, color: fg),
               const SizedBox(width: 8),
               Text(
-                periodName == null ? 'Remaining' : 'Remaining · $periodName',
+                periodName == null
+                    ? l10n.remaining
+                    : l10n.remainingIn(periodName!),
                 style: TextStyle(color: fg, fontWeight: FontWeight.w500),
               ),
               const Spacer(),
               Text(
-                currency.format(remaining),
+                formatZloty(remaining),
                 style: TextStyle(
                   color: fg,
                   fontWeight: FontWeight.bold,

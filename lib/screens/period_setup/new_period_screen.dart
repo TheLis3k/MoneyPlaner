@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../models/category.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
+import '../../util/money_format.dart';
+import '../categories/category_editor.dart';
 
 /// Set up a new planning period: name, date range, income, and how that income
 /// is split across categories. Over-allocation is warned about, never blocked.
@@ -14,6 +17,9 @@ class NewPeriodScreen extends StatefulWidget {
   @override
   State<NewPeriodScreen> createState() => _NewPeriodScreenState();
 }
+
+double _parseAmount(String raw) =>
+    double.tryParse(raw.trim().replaceAll(',', '.')) ?? 0;
 
 class _NewPeriodScreenState extends State<NewPeriodScreen> {
   final _formKey = GlobalKey<FormState>();
@@ -34,7 +40,9 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
     final now = DateTime.now();
     _startDate = DateTime(now.year, now.month, 1);
     _endDate = DateTime(now.year, now.month + 1, 0); // last day of month
-    _nameController.text = DateFormat.yMMMM().format(now);
+    _nameController.text = toBeginningOfSentenceCase(
+      DateFormat.yMMMM('pl').format(now),
+    );
   }
 
   @override
@@ -47,12 +55,12 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
     super.dispose();
   }
 
-  double get _income => double.tryParse(_incomeController.text.trim()) ?? 0;
+  double get _income => _parseAmount(_incomeController.text);
 
   double get _totalPlanned {
     var sum = 0.0;
     for (final c in _plannedControllers.values) {
-      sum += double.tryParse(c.text.trim()) ?? 0;
+      sum += _parseAmount(c.text);
     }
     return sum;
   }
@@ -65,29 +73,36 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
     setState(() => _saving = true);
     final planned = <int, double>{};
     _plannedControllers.forEach((categoryId, controller) {
-      final value = double.tryParse(controller.text.trim()) ?? 0;
+      final value = _parseAmount(controller.text);
       if (value > 0) planned[categoryId] = value;
     });
 
     await context.read<PlannerState>().createPeriod(
-          name: _nameController.text.trim(),
-          startDate: _startDate,
-          endDate: _endDate,
-          income: _income,
-          plannedByCategory: planned,
-        );
+      name: _nameController.text.trim(),
+      startDate: _startDate,
+      endDate: _endDate,
+      income: _income,
+      plannedByCategory: planned,
+    );
 
     if (mounted) Navigator.of(context).pop();
   }
 
+  Future<void> _addCategory() async {
+    final created = await showCategoryEditor(context);
+    if (created != null && mounted) {
+      await context.read<PlannerState>().addCategory(created);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final categories = context.watch<PlannerState>().categories;
-    final currency = NumberFormat.simpleCurrency();
-    final dateFmt = DateFormat.yMMMd();
+    final dateFmt = DateFormat.yMMMd('pl');
 
     return Scaffold(
-      appBar: AppBar(title: const Text('New period')),
+      appBar: AppBar(title: Text(l10n.newPeriod)),
       body: Form(
         key: _formKey,
         onChanged: () => setState(() {}),
@@ -96,19 +111,19 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Period name',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.periodName,
+                border: const OutlineInputBorder(),
               ),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Enter a name' : null,
+                  (v == null || v.trim().isEmpty) ? l10n.enterName : null,
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: _DateField(
-                    label: 'Start',
+                    label: l10n.start,
                     date: _startDate,
                     format: dateFmt,
                     onPick: (d) => setState(() => _startDate = d),
@@ -117,7 +132,7 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _DateField(
-                    label: 'End',
+                    label: l10n.end,
                     date: _endDate,
                     format: dateFmt,
                     onPick: (d) => setState(() => _endDate = d),
@@ -128,30 +143,47 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _incomeController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Income for this period',
-                prefixIcon: Icon(Icons.attach_money),
-                border: OutlineInputBorder(),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: InputDecoration(
+                labelText: l10n.incomeForPeriod,
+                suffixText: 'zł',
+                border: const OutlineInputBorder(),
               ),
               validator: (v) {
-                final value = double.tryParse((v ?? '').trim());
-                if (value == null || value <= 0) return 'Enter your income';
+                final value = _parseAmount(v ?? '');
+                if (value <= 0) return l10n.enterIncome;
                 return null;
               },
             ),
             const SizedBox(height: 20),
-            Text('Split across categories',
-                style: Theme.of(context).textTheme.titleMedium),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.splitAcrossCategories,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                TextButton.icon(
+                  onPressed: _addCategory,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: Text(l10n.addCategory),
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
-            ...categories.map(_categoryRow),
+            if (categories.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(l10n.noCategories),
+              )
+            else
+              ...categories.map(_categoryRow),
             const SizedBox(height: 16),
             _AllocationSummary(
-              income: _income,
               planned: _totalPlanned,
               unallocated: _unallocated,
-              currency: currency,
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -160,9 +192,10 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
                   ? const SizedBox(
                       width: 16,
                       height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2))
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Icon(Icons.check),
-              label: const Text('Create period'),
+              label: Text(l10n.createPeriod),
             ),
           ],
         ),
@@ -171,8 +204,10 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
   }
 
   Widget _categoryRow(Category category) {
-    final controller =
-        _plannedControllers.putIfAbsent(category.id!, TextEditingController.new);
+    final controller = _plannedControllers.putIfAbsent(
+      category.id!,
+      TextEditingController.new,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -180,20 +215,24 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
           CircleAvatar(
             radius: 14,
             backgroundColor: category.displayColor.withValues(alpha: 0.2),
-            child: Icon(category.displayIcon,
-                size: 16, color: category.displayColor),
+            child: Icon(
+              category.displayIcon,
+              size: 16,
+              color: category.displayColor,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(child: Text(category.name)),
           SizedBox(
-            width: 120,
+            width: 130,
             child: TextFormField(
               controller: controller,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               textAlign: TextAlign.end,
               decoration: const InputDecoration(
-                prefixText: '\$ ',
+                suffixText: 'zł',
                 isDense: true,
                 border: OutlineInputBorder(),
               ),
@@ -242,20 +281,14 @@ class _DateField extends StatelessWidget {
 }
 
 class _AllocationSummary extends StatelessWidget {
-  const _AllocationSummary({
-    required this.income,
-    required this.planned,
-    required this.unallocated,
-    required this.currency,
-  });
+  const _AllocationSummary({required this.planned, required this.unallocated});
 
-  final double income;
   final double planned;
   final double unallocated;
-  final NumberFormat currency;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final over = unallocated < 0;
     final scheme = Theme.of(context).colorScheme;
     return Card(
@@ -264,20 +297,19 @@ class _AllocationSummary extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _row(context, 'Planned', currency.format(planned)),
+            _row(context, l10n.planned, formatZloty(planned)),
             const SizedBox(height: 4),
             _row(
               context,
-              over ? 'Over-allocated' : 'Unallocated',
-              currency.format(unallocated),
+              over ? l10n.overAllocated : l10n.unallocated,
+              formatZloty(unallocated),
               emphasize: true,
               color: over ? scheme.onErrorContainer : null,
             ),
             if (over) ...[
               const SizedBox(height: 8),
               Text(
-                "You've allocated ${currency.format(-unallocated)} more than "
-                'your income. You can still continue.',
+                l10n.overAllocationWarning(formatZloty(-unallocated)),
                 style: TextStyle(color: scheme.onErrorContainer, fontSize: 12),
               ),
             ],
@@ -287,15 +319,23 @@ class _AllocationSummary extends StatelessWidget {
     );
   }
 
-  Widget _row(BuildContext context, String label, String value,
-      {bool emphasize = false, Color? color}) {
+  Widget _row(
+    BuildContext context,
+    String label,
+    String value, {
+    bool emphasize = false,
+    Color? color,
+  }) {
     final style = TextStyle(
       fontWeight: emphasize ? FontWeight.bold : FontWeight.normal,
       color: color,
     );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [Text(label, style: style), Text(value, style: style)],
+      children: [
+        Text(label, style: style),
+        Text(value, style: style),
+      ],
     );
   }
 }

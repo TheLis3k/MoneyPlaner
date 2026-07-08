@@ -1,0 +1,63 @@
+{
+  "@@locale": "pl",
+  "appTitle": "Money Planner",
+
+  "dashboardEmptyTitle": "Tutaj mieszka Twój budżet kopertowy.",
+  "dashboardEmptyBody": "Utwórz okres i podziel swój dochód, aby zacząć.",
+  "newPeriod": "Nowy okres",
+  "addExpense": "Dodaj wydatek",
+  "envelopes": "Koperty",
+  "noEnvelopes": "Nie przydzielono jeszcze żadnych kategorii.",
+
+  "income": "Dochód",
+  "planned": "Zaplanowano",
+  "spent": "Wydano",
+  "unallocated": "Nieprzydzielone",
+  "overAllocated": "Przydzielono za dużo",
+
+  "remaining": "Pozostało",
+  "remainingIn": "Pozostało · {period}",
+  "amountLeft": "pozostało {amount}",
+  "overBy": "przekroczono o {amount}",
+
+  "periodName": "Nazwa okresu",
+  "enterName": "Podaj nazwę",
+  "start": "Początek",
+  "end": "Koniec",
+  "incomeForPeriod": "Dochód w tym okresie",
+  "enterIncome": "Podaj swój dochód",
+  "splitAcrossCategories": "Podziel na kategorie",
+  "overAllocationWarning": "Przydzielono o {amount} więcej niż wynosi dochód. Możesz mimo to kontynuować.",
+  "createPeriod": "Utwórz okres",
+
+  "noEnvelopesForExpense": "Ten okres nie ma jeszcze żadnych kopert. Dodaj kategorie do okresu, zanim zapiszesz wydatki.",
+  "envelope": "Koperta",
+  "pickEnvelope": "Wybierz kopertę",
+  "amount": "Kwota",
+  "enterAmount": "Podaj kwotę",
+  "date": "Data",
+  "noteOptional": "Notatka (opcjonalnie)",
+  "saveExpense": "Zapisz wydatek",
+
+  "categories": "Kategorie",
+  "manageCategories": "Zarządzaj kategoriami",
+  "newCategory": "Nowa kategoria",
+  "editCategory": "Edytuj kategorię",
+  "name": "Nazwa",
+  "icon": "Ikona",
+  "color": "Kolor",
+  "save": "Zapisz",
+  "delete": "Usuń",
+  "addCategory": "Dodaj kategorię",
+  "noCategories": "Brak kategorii. Dodaj swoją pierwszą.",
+  "categoryInUse": "Nie można usunąć kategorii używanej w okresie.",
+
+  "period": "Okres",
+
+  "expenses": "Wydatki",
+  "noExpenses": "Brak wydatków w tej kopercie.",
+  "deleteExpense": "Usuń wydatek",
+  "deleteExpenseConfirm": "Usunąć ten wydatek na {amount}?",
+  "cancel": "Anuluj",
+  "expenseDeleted": "Wydatek usunięty"
+}

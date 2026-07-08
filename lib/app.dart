@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'l10n/app_localizations.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'state/planner_state.dart';
 import 'theme/app_theme.dart';
 
-/// Root widget: provides app-wide state and wires up theming + home screen.
+/// Root widget: provides app-wide state and wires up theming, localization
+/// (Polish by default) and the home screen.
 class MoneyPlannerApp extends StatelessWidget {
   const MoneyPlannerApp({super.key});
 
@@ -14,11 +16,14 @@ class MoneyPlannerApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => PlannerState()..load(),
       child: MaterialApp(
-        title: 'Money Planner',
+        onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         themeMode: ThemeMode.system,
+        locale: const Locale('pl'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: const DashboardScreen(),
       ),
     );
