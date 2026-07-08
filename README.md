@@ -131,12 +131,14 @@ flutter test
 ## 🗺️ Roadmap
 
 - [x] **Phase 0** — Project scaffold, data model, SQLite schema
-- [ ] **Phase 1** — New Period & Add Expense screens, numeric dashboard
-- [ ] **Phase 2** — Charts (pie split, spent-vs-planned bars, spending line)
+- [x] **Phase 1** — New Period & Add Expense screens, numeric dashboard, category detail with expense history
+- [x] **Phase 2** — Charts (pie split, planned-vs-spent bars, spending-over-time line)
 - [ ] **Phase 3** — Recurring rules + auto-generated expenses
 - [ ] **Phase 4** — PIN + biometric lock screen
 - [ ] **Phase 5** — Encrypted GitHub sync (push/pull `data.enc`)
-- [ ] **Phase 6** — History view, category management, edge-case polish
+- [ ] **Phase 6** — History view, edge-case polish
+
+**Extras already in:** custom categories with icon/color picker · full Polish localization (`pl`) with zł currency · period switcher.
 
 ## 🤝 Contributing
 
