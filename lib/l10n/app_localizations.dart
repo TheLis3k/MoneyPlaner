@@ -308,6 +308,12 @@ abstract class AppLocalizations {
   /// **'Save expense'**
   String get saveExpense;
 
+  /// No description provided for @editExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit expense'**
+  String get editExpense;
+
   /// No description provided for @categories.
   ///
   /// In en, this message translates to:

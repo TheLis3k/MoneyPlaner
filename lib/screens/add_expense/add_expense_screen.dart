@@ -4,16 +4,26 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/category_progress.dart';
+import '../../models/expense.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
 
-/// Log a real expense against one of the current period's envelopes.
+String _amountText(double v) {
+  final s = v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
+  return s.replaceAll('.', ',');
+}
+
+/// Log a real expense against one of the current period's envelopes, or edit
+/// an existing one when [existing] is provided.
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key, this.initialSplitId});
+  const AddExpenseScreen({super.key, this.initialSplitId, this.existing});
 
   /// Pre-selects this envelope (e.g. when opened from a category's detail).
   final int? initialSplitId;
+
+  /// When non-null, the screen edits this expense instead of adding one.
+  final Expense? existing;
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -28,10 +38,20 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   DateTime _date = DateTime.now();
   bool _saving = false;
 
+  bool get _isEdit => widget.existing != null;
+
   @override
   void initState() {
     super.initState();
-    _splitId = widget.initialSplitId;
+    final e = widget.existing;
+    if (e != null) {
+      _splitId = e.splitId;
+      _amountController.text = _amountText(e.amount);
+      _date = e.date;
+      _noteController.text = e.note ?? '';
+    } else {
+      _splitId = widget.initialSplitId;
+    }
   }
 
   @override
@@ -46,14 +66,31 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     if (_splitId == null) return;
 
     setState(() => _saving = true);
-    await context.read<PlannerState>().addExpense(
-      splitId: _splitId!,
-      amount: double.parse(_amountController.text.trim().replaceAll(',', '.')),
-      date: _date,
-      note: _noteController.text.trim().isEmpty
-          ? null
-          : _noteController.text.trim(),
+    final state = context.read<PlannerState>();
+    final amount = double.parse(
+      _amountController.text.trim().replaceAll(',', '.'),
     );
+    final note = _noteController.text.trim().isEmpty
+        ? null
+        : _noteController.text.trim();
+
+    if (_isEdit) {
+      await state.updateExpense(
+        widget.existing!.copyWith(
+          splitId: _splitId!,
+          amount: amount,
+          date: _date,
+          note: note,
+        ),
+      );
+    } else {
+      await state.addExpense(
+        splitId: _splitId!,
+        amount: amount,
+        date: _date,
+        note: note,
+      );
+    }
     if (mounted) Navigator.of(context).pop();
   }
 
@@ -64,7 +101,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     final dateFmt = DateFormat.yMMMd('pl');
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.addExpense)),
+      appBar: AppBar(title: Text(_isEdit ? l10n.editExpense : l10n.addExpense)),
       body: progress.isEmpty
           ? Center(
               child: Padding(
@@ -153,7 +190,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.check),
-                    label: Text(l10n.saveExpense),
+                    label: Text(_isEdit ? l10n.saveChanges : l10n.saveExpense),
                   ),
                 ],
               ),

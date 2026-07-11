@@ -40,6 +40,7 @@
   "date": "Data",
   "noteOptional": "Notatka (opcjonalnie)",
   "saveExpense": "Zapisz wydatek",
+  "editExpense": "Edytuj wydatek",
 
   "categories": "Kategorie",
   "manageCategories": "Zarządzaj kategoriami",

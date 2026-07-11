@@ -193,6 +193,16 @@ class PlannerRepository {
     return rows.map(Expense.fromMap).toList();
   }
 
+  Future<void> updateExpense(Expense expense) async {
+    final db = await _db;
+    await db.update(
+      'expenses',
+      expense.toMap(),
+      where: 'id = ?',
+      whereArgs: [expense.id],
+    );
+  }
+
   Future<void> deleteExpense(int expenseId) async {
     final db = await _db;
     await db.delete('expenses', where: 'id = ?', whereArgs: [expenseId]);

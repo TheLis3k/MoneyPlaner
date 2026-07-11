@@ -196,6 +196,12 @@ class PlannerState extends ChangeNotifier {
   Future<List<CategoryProgress>> progressForPeriod(int periodId) =>
       _repo.categoryProgress(periodId);
 
+  Future<void> updateExpense(Expense expense) async {
+    await _repo.updateExpense(expense);
+    await _refreshProgress();
+    notifyListeners();
+  }
+
   Future<void> deleteExpense(int expenseId) async {
     await _repo.deleteExpense(expenseId);
     await _refreshProgress();

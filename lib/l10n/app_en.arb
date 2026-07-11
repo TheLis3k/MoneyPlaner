@@ -52,6 +52,7 @@
   "date": "Date",
   "noteOptional": "Note (optional)",
   "saveExpense": "Save expense",
+  "editExpense": "Edit expense",
 
   "categories": "Categories",
   "manageCategories": "Manage categories",

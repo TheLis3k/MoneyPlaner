@@ -124,6 +124,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get saveExpense => 'Zapisz wydatek';
 
   @override
+  String get editExpense => 'Edytuj wydatek';
+
+  @override
   String get categories => 'Kategorie';
 
   @override

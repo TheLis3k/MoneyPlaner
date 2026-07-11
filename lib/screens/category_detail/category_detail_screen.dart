@@ -186,6 +186,9 @@ class _ExpenseTile extends StatelessWidget {
         tooltip: l10n.deleteExpense,
         onPressed: () => _confirmDelete(context),
       ),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => AddExpenseScreen(existing: expense)),
+      ),
     );
   }
 
