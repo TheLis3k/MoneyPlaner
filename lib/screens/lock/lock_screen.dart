@@ -37,7 +37,9 @@ class _LockScreenState extends State<LockScreen> {
   @override
   void initState() {
     super.initState();
-    _maybeStartBiometric();
+    // Run after the first frame so the native window is shown and focused —
+    // otherwise the OS (e.g. Windows Hello) won't display its prompt.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartBiometric());
   }
 
   @override
