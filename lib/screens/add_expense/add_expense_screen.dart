@@ -10,7 +10,10 @@ import '../../util/money_format.dart';
 
 /// Log a real expense against one of the current period's envelopes.
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  const AddExpenseScreen({super.key, this.initialSplitId});
+
+  /// Pre-selects this envelope (e.g. when opened from a category's detail).
+  final int? initialSplitId;
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -24,6 +27,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   int? _splitId;
   DateTime _date = DateTime.now();
   bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _splitId = widget.initialSplitId;
+  }
 
   @override
   void dispose() {

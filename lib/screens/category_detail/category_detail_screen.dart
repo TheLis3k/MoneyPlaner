@@ -8,6 +8,7 @@ import '../../models/expense.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
+import '../add_expense/add_expense_screen.dart';
 import 'widgets/spending_line_chart.dart';
 
 /// Detail for a single envelope: planned/spent/remaining plus the list of
@@ -31,6 +32,15 @@ class CategoryDetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(progress.category.name)),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => AddExpenseScreen(initialSplitId: splitId),
+          ),
+        ),
+        icon: const Icon(Icons.add),
+        label: Text(l10n.addExpense),
+      ),
       body: Column(
         children: [
           _Header(progress: progress),
