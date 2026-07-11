@@ -135,7 +135,7 @@ flutter test
 - [x] **Phase 2** — Charts (pie split, planned-vs-spent bars, spending-over-time line)
 - [x] **Phase 3** — Recurring rules: templates, pre-fill new periods, auto-generate expenses
 - [x] **Phase 4** — PIN (salted PBKDF2) + biometric lock screen, Settings security section
-- [ ] **Phase 5** — Encrypted GitHub sync (push/pull `data.enc`)
+- [x] **Phase 5** — Encrypted GitHub sync: AES + PBKDF2, push/pull `data.enc` via the GitHub API
 - [ ] **Phase 6** — History view, edge-case polish
 
 **Extras already in:** custom categories with icon/color picker · full Polish localization (`pl`) with zł currency · period switcher.
