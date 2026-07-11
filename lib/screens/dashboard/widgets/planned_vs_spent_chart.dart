@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/category_progress.dart';
 import '../../../theme/category_visuals.dart';
+import '../../../util/money_format.dart';
 import '../../../widgets/chart_card.dart';
 
 /// Grouped bars comparing planned vs. spent for each envelope.
@@ -43,6 +44,37 @@ class PlannedVsSpentChart extends StatelessWidget {
               BarChartData(
                 maxY: maxY,
                 alignment: BarChartAlignment.spaceAround,
+                barTouchData: BarTouchData(
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (_) => scheme.surfaceContainerHighest,
+                    tooltipPadding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      final item = items[group.x];
+                      final label = rodIndex == 0 ? l10n.planned : l10n.spent;
+                      return BarTooltipItem(
+                        '${item.category.name}\n',
+                        TextStyle(
+                          color: scheme.onSurface,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: '$label: ${formatZloty(rod.toY)}',
+                            style: TextStyle(
+                              color: scheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
                 gridData: const FlGridData(show: false),
                 borderData: FlBorderData(show: false),
                 titlesData: FlTitlesData(
