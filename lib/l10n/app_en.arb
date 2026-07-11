@@ -79,5 +79,24 @@
   "plannedSplit": "Planned split",
   "plannedVsSpent": "Planned vs. spent",
   "spendingOverTime": "Spending over time",
-  "notEnoughData": "Not enough data yet."
+  "notEnoughData": "Not enough data yet.",
+
+  "recurringRules": "Recurring rules",
+  "newRule": "New rule",
+  "editRule": "Edit rule",
+  "addRule": "Add rule",
+  "category": "Category",
+  "note": "Note",
+  "frequency": "Frequency",
+  "weekly": "Weekly",
+  "monthly": "Monthly",
+  "active": "Active",
+  "noRecurringRules": "No recurring rules yet. Add templates for regular income or expenses.",
+  "prefillFromRecurring": "Pre-fill from recurring",
+  "applyRecurring": "Add recurring to this period",
+  "recurringApplied": "{count, plural, =0{Everything is already up to date} =1{Added 1 recurring expense} other{Added {count} recurring expenses}}",
+  "@recurringApplied": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "needCategoryFirst": "Add a category first."
 }

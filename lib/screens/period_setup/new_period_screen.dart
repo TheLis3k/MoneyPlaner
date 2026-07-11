@@ -95,6 +95,20 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
     }
   }
 
+  /// Fills the planned allocation fields from active recurring rules.
+  void _prefillFromRecurring() {
+    final planned = context.read<PlannerState>().plannedFromRecurring();
+    setState(() {
+      planned.forEach((categoryId, amount) {
+        final controller = _plannedControllers.putIfAbsent(
+          categoryId,
+          TextEditingController.new,
+        );
+        controller.text = amount.toString().replaceAll('.', ',');
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -158,13 +172,23 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
               },
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Text(
+              l10n.splitAcrossCategories,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 8,
               children: [
-                Text(
-                  l10n.splitAcrossCategories,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                if (context
+                    .watch<PlannerState>()
+                    .activeRecurringRules
+                    .isNotEmpty)
+                  TextButton.icon(
+                    onPressed: _prefillFromRecurring,
+                    icon: const Icon(Icons.repeat, size: 18),
+                    label: Text(l10n.prefillFromRecurring),
+                  ),
                 TextButton.icon(
                   onPressed: _addCategory,
                   icon: const Icon(Icons.add, size: 18),

@@ -27,6 +27,11 @@ class PlannerState extends ChangeNotifier {
   List<Category> _categories = const [];
   List<Category> get categories => _categories;
 
+  List<RecurringRule> _recurringRules = const [];
+  List<RecurringRule> get recurringRules => _recurringRules;
+  List<RecurringRule> get activeRecurringRules =>
+      _recurringRules.where((r) => r.active).toList();
+
   List<CategoryProgress> _progress = const [];
   List<CategoryProgress> get progress => _progress;
 
@@ -53,6 +58,7 @@ class PlannerState extends ChangeNotifier {
     notifyListeners();
 
     _categories = await _repo.getCategories();
+    _recurringRules = await _repo.getRecurringRules();
     _periods = await _repo.getPeriods();
     _currentPeriod = _periods.isNotEmpty ? _periods.first : null;
     await _refreshProgress();
@@ -156,5 +162,81 @@ class PlannerState extends ChangeNotifier {
     _categories = await _repo.getCategories();
     notifyListeners();
     return true;
+  }
+
+  // ---- recurring rules ------------------------------------------------------
+
+  Future<void> saveRecurringRule(RecurringRule rule) async {
+    if (rule.id == null) {
+      await _repo.insertRecurringRule(rule);
+    } else {
+      await _repo.updateRecurringRule(rule);
+    }
+    _recurringRules = await _repo.getRecurringRules();
+    notifyListeners();
+  }
+
+  Future<void> deleteRecurringRule(int ruleId) async {
+    await _repo.deleteRecurringRule(ruleId);
+    _recurringRules = await _repo.getRecurringRules();
+    notifyListeners();
+  }
+
+  /// Sum of active rules per category — used to pre-fill a new period's plan.
+  Map<int, double> plannedFromRecurring() {
+    final byCategory = <int, double>{};
+    for (final rule in activeRecurringRules) {
+      byCategory[rule.categoryId] =
+          (byCategory[rule.categoryId] ?? 0) + rule.amount;
+    }
+    return byCategory;
+  }
+
+  /// Generates an expense in the current period for each active rule that
+  /// hasn't been applied there yet, creating a split on demand. Returns the
+  /// number of expenses added.
+  Future<int> applyRecurringToCurrentPeriod() async {
+    final period = _currentPeriod;
+    if (period?.id == null) return 0;
+
+    final applied = await _repo.appliedRecurringIds(period!.id!);
+    var added = 0;
+    for (final rule in activeRecurringRules) {
+      if (applied.contains(rule.id)) continue;
+
+      var split = await _repo.getSplitForCategory(period.id!, rule.categoryId);
+      if (split == null) {
+        final splitId = await _repo.insertSplit(
+          Split(
+            periodId: period.id!,
+            categoryId: rule.categoryId,
+            plannedAmount: rule.amount,
+          ),
+        );
+        split = Split(
+          id: splitId,
+          periodId: period.id!,
+          categoryId: rule.categoryId,
+          plannedAmount: rule.amount,
+        );
+      }
+
+      await _repo.insertExpense(
+        Expense(
+          splitId: split.id!,
+          amount: rule.amount,
+          date: DateTime.now(),
+          note: rule.note,
+          recurringId: rule.id,
+        ),
+      );
+      added++;
+    }
+
+    if (added > 0) {
+      await _refreshProgress();
+      notifyListeners();
+    }
+    return added;
   }
 }

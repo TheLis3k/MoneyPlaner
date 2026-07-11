@@ -64,5 +64,21 @@
   "plannedSplit": "Podział planu",
   "plannedVsSpent": "Plan a wydatki",
   "spendingOverTime": "Wydatki w czasie",
-  "notEnoughData": "Za mało danych."
+  "notEnoughData": "Za mało danych.",
+
+  "recurringRules": "Reguły cykliczne",
+  "newRule": "Nowa reguła",
+  "editRule": "Edytuj regułę",
+  "addRule": "Dodaj regułę",
+  "category": "Kategoria",
+  "note": "Notatka",
+  "frequency": "Częstotliwość",
+  "weekly": "Tygodniowo",
+  "monthly": "Miesięcznie",
+  "active": "Aktywna",
+  "noRecurringRules": "Brak reguł cyklicznych. Dodaj szablony dla stałych przychodów lub wydatków.",
+  "prefillFromRecurring": "Wypełnij z reguł",
+  "applyRecurring": "Dodaj cykliczne do okresu",
+  "recurringApplied": "{count, plural, =0{Wszystko jest już aktualne} =1{Dodano 1 wydatek cykliczny} few{Dodano {count} wydatki cykliczne} many{Dodano {count} wydatków cyklicznych} other{Dodano {count} wydatku cyklicznego}}",
+  "needCategoryFirst": "Najpierw dodaj kategorię."
 }

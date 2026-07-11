@@ -98,6 +98,62 @@ class PlannerRepository {
     await db.delete('splits', where: 'id = ?', whereArgs: [splitId]);
   }
 
+  /// The split for a category within a period, or null if none exists yet.
+  Future<Split?> getSplitForCategory(int periodId, int categoryId) async {
+    final db = await _db;
+    final rows = await db.query(
+      'splits',
+      where: 'period_id = ? AND category_id = ?',
+      whereArgs: [periodId, categoryId],
+      limit: 1,
+    );
+    return rows.isEmpty ? null : Split.fromMap(rows.first);
+  }
+
+  // ----------------------------------------------------------- recurring rules
+
+  Future<List<RecurringRule>> getRecurringRules() async {
+    final db = await _db;
+    final rows = await db.query('recurring_rules', orderBy: 'id DESC');
+    return rows.map(RecurringRule.fromMap).toList();
+  }
+
+  Future<int> insertRecurringRule(RecurringRule rule) async {
+    final db = await _db;
+    return db.insert('recurring_rules', rule.toMap()..remove('id'));
+  }
+
+  Future<void> updateRecurringRule(RecurringRule rule) async {
+    final db = await _db;
+    await db.update(
+      'recurring_rules',
+      rule.toMap(),
+      where: 'id = ?',
+      whereArgs: [rule.id],
+    );
+  }
+
+  Future<void> deleteRecurringRule(int ruleId) async {
+    final db = await _db;
+    await db.delete('recurring_rules', where: 'id = ?', whereArgs: [ruleId]);
+  }
+
+  /// Recurring rule ids that have already produced an expense in this period,
+  /// so applying rules twice doesn't create duplicates.
+  Future<Set<int>> appliedRecurringIds(int periodId) async {
+    final db = await _db;
+    final rows = await db.rawQuery(
+      '''
+      SELECT DISTINCT e.recurring_id AS rid
+      FROM expenses e
+      JOIN splits s ON s.id = e.split_id
+      WHERE s.period_id = ? AND e.recurring_id IS NOT NULL
+    ''',
+      [periodId],
+    );
+    return {for (final row in rows) row['rid'] as int};
+  }
+
   // ------------------------------------------------------------------ expenses
 
   Future<int> insertExpense(Expense expense) async {

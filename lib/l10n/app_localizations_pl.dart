@@ -187,4 +187,61 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get notEnoughData => 'Za mało danych.';
+
+  @override
+  String get recurringRules => 'Reguły cykliczne';
+
+  @override
+  String get newRule => 'Nowa reguła';
+
+  @override
+  String get editRule => 'Edytuj regułę';
+
+  @override
+  String get addRule => 'Dodaj regułę';
+
+  @override
+  String get category => 'Kategoria';
+
+  @override
+  String get note => 'Notatka';
+
+  @override
+  String get frequency => 'Częstotliwość';
+
+  @override
+  String get weekly => 'Tygodniowo';
+
+  @override
+  String get monthly => 'Miesięcznie';
+
+  @override
+  String get active => 'Aktywna';
+
+  @override
+  String get noRecurringRules =>
+      'Brak reguł cyklicznych. Dodaj szablony dla stałych przychodów lub wydatków.';
+
+  @override
+  String get prefillFromRecurring => 'Wypełnij z reguł';
+
+  @override
+  String get applyRecurring => 'Dodaj cykliczne do okresu';
+
+  @override
+  String recurringApplied(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Dodano $count wydatku cyklicznego',
+      many: 'Dodano $count wydatków cyklicznych',
+      few: 'Dodano $count wydatki cykliczne',
+      one: 'Dodano 1 wydatek cykliczny',
+      zero: 'Wszystko jest już aktualne',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get needCategoryFirst => 'Najpierw dodaj kategorię.';
 }

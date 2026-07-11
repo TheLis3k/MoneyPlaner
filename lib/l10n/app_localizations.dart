@@ -433,6 +433,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not enough data yet.'**
   String get notEnoughData;
+
+  /// No description provided for @recurringRules.
+  ///
+  /// In en, this message translates to:
+  /// **'Recurring rules'**
+  String get recurringRules;
+
+  /// No description provided for @newRule.
+  ///
+  /// In en, this message translates to:
+  /// **'New rule'**
+  String get newRule;
+
+  /// No description provided for @editRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit rule'**
+  String get editRule;
+
+  /// No description provided for @addRule.
+  ///
+  /// In en, this message translates to:
+  /// **'Add rule'**
+  String get addRule;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @note.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get note;
+
+  /// No description provided for @frequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency'**
+  String get frequency;
+
+  /// No description provided for @weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get weekly;
+
+  /// No description provided for @monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get monthly;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// No description provided for @noRecurringRules.
+  ///
+  /// In en, this message translates to:
+  /// **'No recurring rules yet. Add templates for regular income or expenses.'**
+  String get noRecurringRules;
+
+  /// No description provided for @prefillFromRecurring.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-fill from recurring'**
+  String get prefillFromRecurring;
+
+  /// No description provided for @applyRecurring.
+  ///
+  /// In en, this message translates to:
+  /// **'Add recurring to this period'**
+  String get applyRecurring;
+
+  /// No description provided for @recurringApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Everything is already up to date} =1{Added 1 recurring expense} other{Added {count} recurring expenses}}'**
+  String recurringApplied(int count);
+
+  /// No description provided for @needCategoryFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a category first.'**
+  String get needCategoryFirst;
 }
 
 class _AppLocalizationsDelegate

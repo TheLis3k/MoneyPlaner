@@ -188,4 +188,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notEnoughData => 'Not enough data yet.';
+
+  @override
+  String get recurringRules => 'Recurring rules';
+
+  @override
+  String get newRule => 'New rule';
+
+  @override
+  String get editRule => 'Edit rule';
+
+  @override
+  String get addRule => 'Add rule';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String get note => 'Note';
+
+  @override
+  String get frequency => 'Frequency';
+
+  @override
+  String get weekly => 'Weekly';
+
+  @override
+  String get monthly => 'Monthly';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get noRecurringRules =>
+      'No recurring rules yet. Add templates for regular income or expenses.';
+
+  @override
+  String get prefillFromRecurring => 'Pre-fill from recurring';
+
+  @override
+  String get applyRecurring => 'Add recurring to this period';
+
+  @override
+  String recurringApplied(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Added $count recurring expenses',
+      one: 'Added 1 recurring expense',
+      zero: 'Everything is already up to date',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get needCategoryFirst => 'Add a category first.';
 }
