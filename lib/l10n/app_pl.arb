@@ -121,5 +121,10 @@
   "restoreWarningTitle": "Przywrócić z chmury?",
   "restoreWarningBody": "To zastąpi wszystkie lokalne dane kopią z chmury.",
   "syncFailed": "Synchronizacja nie powiodła się: {error}",
-  "restore": "Przywróć"
+  "restore": "Przywróć",
+
+  "history": "Historia",
+  "noPeriodsYet": "Brak okresów.",
+  "dashboard": "Pulpit",
+  "periodRange": "{start} – {end}"
 }

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' hide Category;
 import '../data/planner_repository.dart';
 import '../models/models.dart';
 import '../models/category_progress.dart';
+import '../models/period_summary.dart';
 
 /// App-wide state for the current planning period.
 ///
@@ -134,6 +135,11 @@ class PlannerState extends ChangeNotifier {
 
   Future<List<Expense>> expensesForSplit(int splitId) =>
       _repo.getExpensesForSplit(splitId);
+
+  Future<List<PeriodSummary>> periodSummaries() => _repo.periodSummaries();
+
+  Future<List<CategoryProgress>> progressForPeriod(int periodId) =>
+      _repo.categoryProgress(periodId);
 
   Future<void> deleteExpense(int expenseId) async {
     await _repo.deleteExpense(expenseId);

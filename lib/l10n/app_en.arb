@@ -145,5 +145,16 @@
   "@syncFailed": {
     "placeholders": { "error": { "type": "String" } }
   },
-  "restore": "Restore"
+  "restore": "Restore",
+
+  "history": "History",
+  "noPeriodsYet": "No periods yet.",
+  "dashboard": "Dashboard",
+  "periodRange": "{start} – {end}",
+  "@periodRange": {
+    "placeholders": {
+      "start": { "type": "String" },
+      "end": { "type": "String" }
+    }
+  }
 }

@@ -367,4 +367,18 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get restore => 'Przywróć';
+
+  @override
+  String get history => 'Historia';
+
+  @override
+  String get noPeriodsYet => 'Brak okresów.';
+
+  @override
+  String get dashboard => 'Pulpit';
+
+  @override
+  String periodRange(String start, String end) {
+    return '$start – $end';
+  }
 }

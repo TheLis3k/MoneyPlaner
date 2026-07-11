@@ -2,6 +2,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../models/models.dart';
 import '../models/category_progress.dart';
+import '../models/period_summary.dart';
 import 'database_helper.dart';
 
 /// Single entry point for all persistence: periods, categories, splits and
@@ -243,6 +244,41 @@ class PlannerRepository {
   }
 
   // ----------------------------------------------------------------- aggregate
+
+  /// Planned + spent totals for every period, in three queries.
+  Future<List<PeriodSummary>> periodSummaries() async {
+    final periods = await getPeriods();
+    if (periods.isEmpty) return const [];
+
+    final db = await _db;
+    final plannedRows = await db.rawQuery(
+      'SELECT period_id AS pid, SUM(planned_amount) AS total '
+      'FROM splits GROUP BY period_id',
+    );
+    final spentRows = await db.rawQuery('''
+      SELECT s.period_id AS pid, SUM(e.amount) AS total
+      FROM expenses e JOIN splits s ON s.id = e.split_id
+      GROUP BY s.period_id
+    ''');
+
+    final plannedBy = {
+      for (final r in plannedRows)
+        r['pid'] as int: (r['total'] as num).toDouble(),
+    };
+    final spentBy = {
+      for (final r in spentRows)
+        r['pid'] as int: (r['total'] as num).toDouble(),
+    };
+
+    return [
+      for (final p in periods)
+        PeriodSummary(
+          period: p,
+          planned: plannedBy[p.id] ?? 0,
+          spent: spentBy[p.id] ?? 0,
+        ),
+    ];
+  }
 
   /// Assembles the per-category planned/spent/remaining view for a period.
   Future<List<CategoryProgress>> categoryProgress(int periodId) async {

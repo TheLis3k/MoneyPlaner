@@ -7,13 +7,11 @@ import '../../models/period.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
+import '../../widgets/app_drawer.dart';
 import '../../widgets/remaining_balance_bar.dart';
 import '../add_expense/add_expense_screen.dart';
-import '../categories/categories_screen.dart';
 import '../category_detail/category_detail_screen.dart';
 import '../period_setup/new_period_screen.dart';
-import '../recurring/recurring_rules_screen.dart';
-import '../settings/settings_screen.dart';
 import 'widgets/planned_pie_chart.dart';
 import 'widgets/planned_vs_spent_chart.dart';
 
@@ -32,30 +30,8 @@ class DashboardScreen extends StatelessWidget {
         title: period != null && state.periods.length > 1
             ? _PeriodSwitcher(state: state)
             : Text(l10n.appTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.recurringRules,
-            icon: const Icon(Icons.repeat),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const RecurringRulesScreen()),
-            ),
-          ),
-          IconButton(
-            tooltip: l10n.manageCategories,
-            icon: const Icon(Icons.category_outlined),
-            onPressed: () => Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (_) => const CategoriesScreen())),
-          ),
-          IconButton(
-            tooltip: l10n.settings,
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
-          ),
-        ],
       ),
+      drawer: const AppDrawer(),
       body: Builder(
         builder: (context) {
           if (state.isLoading) {

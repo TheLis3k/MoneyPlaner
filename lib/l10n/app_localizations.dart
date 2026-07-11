@@ -757,6 +757,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Restore'**
   String get restore;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @noPeriodsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No periods yet.'**
+  String get noPeriodsYet;
+
+  /// No description provided for @dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get dashboard;
+
+  /// No description provided for @periodRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{start} – {end}'**
+  String periodRange(String start, String end);
 }
 
 class _AppLocalizationsDelegate

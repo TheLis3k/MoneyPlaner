@@ -365,4 +365,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restore => 'Restore';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get noPeriodsYet => 'No periods yet.';
+
+  @override
+  String get dashboard => 'Dashboard';
+
+  @override
+  String periodRange(String start, String end) {
+    return '$start – $end';
+  }
 }
