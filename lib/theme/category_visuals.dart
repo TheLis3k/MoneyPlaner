@@ -29,20 +29,21 @@ const Map<String, IconData> categoryIcons = <String, IconData>{
   'wallet': Icons.account_balance_wallet_outlined,
 };
 
-/// Default palette offered in the category color picker (Material-ish hues).
+/// Default palette offered in the category color picker (shadcn/Tailwind hues
+/// matching the app's dark design).
 const List<String> categoryColorPalette = <String>[
-  '#5C6BC0',
-  '#66BB6A',
-  '#FFA726',
-  '#26A69A',
-  '#EC407A',
-  '#EF5350',
-  '#AB47BC',
-  '#42A5F5',
-  '#8D6E63',
-  '#78909C',
-  '#FFCA28',
-  '#9CCC65',
+  '#22C55E',
+  '#EC4899',
+  '#6366F1',
+  '#14B8A6',
+  '#F59E0B',
+  '#EF4444',
+  '#A855F7',
+  '#3B82F6',
+  '#F97316',
+  '#10B981',
+  '#EAB308',
+  '#8B5CF6',
 ];
 
 /// Resolves the string `color`/`icon` stored on a [Category] into real Flutter

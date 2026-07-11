@@ -7,11 +7,13 @@ import '../../models/period.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
-import '../../widgets/app_drawer.dart';
-import '../../widgets/remaining_balance_bar.dart';
 import '../add_expense/add_expense_screen.dart';
+import '../categories/categories_screen.dart';
 import '../category_detail/category_detail_screen.dart';
+import '../history/history_screen.dart';
 import '../period_setup/new_period_screen.dart';
+import '../recurring/recurring_rules_screen.dart';
+import '../settings/settings_screen.dart';
 import 'widgets/planned_pie_chart.dart';
 import 'widgets/planned_vs_spent_chart.dart';
 
@@ -27,11 +29,30 @@ class DashboardScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 20,
         title: period != null && state.periods.length > 1
             ? _PeriodSwitcher(state: state)
-            : Text(l10n.appTitle),
+            : Row(
+                children: [
+                  const Icon(Icons.savings_outlined, size: 20),
+                  const SizedBox(width: 10),
+                  Text(
+                    l10n.appTitle,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+        actions: [
+          IconButton(
+            tooltip: l10n.recurringRules,
+            icon: const Icon(Icons.repeat),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const RecurringRulesScreen()),
+            ),
+          ),
+          const SizedBox(width: 4),
+        ],
       ),
-      drawer: const AppDrawer(),
       body: Builder(
         builder: (context) {
           if (state.isLoading) {
@@ -43,12 +64,7 @@ class DashboardScreen extends StatelessWidget {
           return _PeriodView(state: state);
         },
       ),
-      bottomNavigationBar: period == null
-          ? null
-          : RemainingBalanceBar(
-              remaining: state.totalRemaining,
-              periodName: period.name,
-            ),
+      bottomNavigationBar: const _BottomNav(),
       floatingActionButton: period == null
           ? null
           : FloatingActionButton.extended(
@@ -68,6 +84,61 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
+/// Bottom navigation. The dashboard is index 0 ("Plan"); the other
+/// destinations push their screens and the bar snaps back to Plan.
+class _BottomNav extends StatelessWidget {
+  const _BottomNav();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+          ),
+        ),
+      ),
+      child: NavigationBar(
+        selectedIndex: 0,
+        onDestinationSelected: (i) {
+          Widget? screen = switch (i) {
+            1 => const HistoryScreen(),
+            2 => const CategoriesScreen(),
+            3 => const SettingsScreen(),
+            _ => null,
+          };
+          if (screen != null) {
+            Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => screen));
+          }
+        },
+        destinations: [
+          NavigationDestination(
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: l10n.dashboard,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.history),
+            label: l10n.history,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.grid_view_outlined),
+            label: l10n.categories,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.settings_outlined),
+            label: l10n.settings,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _PeriodSwitcher extends StatelessWidget {
   const _PeriodSwitcher({required this.state});
   final PlannerState state;
@@ -79,7 +150,10 @@ class _PeriodSwitcher extends StatelessWidget {
         value: state.currentPeriod!.id,
         isExpanded: true,
         borderRadius: BorderRadius.circular(12),
-        style: Theme.of(context).textTheme.titleLarge,
+        dropdownColor: Theme.of(context).colorScheme.surfaceContainer,
+        style: Theme.of(
+          context,
+        ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
         items: [
           for (final Period p in state.periods)
             DropdownMenuItem(value: p.id, child: Text(p.name)),
@@ -135,26 +209,46 @@ class _PeriodView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
       children: [
         _SummaryCard(state: state),
         if (state.progress.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          PlannedPieChart(progress: state.progress),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
+          PlannedPieChart(progress: state.progress, spent: state.totalSpent),
+          const SizedBox(height: 14),
           PlannedVsSpentChart(progress: state.progress),
         ],
-        const SizedBox(height: 16),
-        Text(l10n.envelopes, style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 8),
+        const SizedBox(height: 20),
+        _SectionLabel(l10n.envelopes),
+        const SizedBox(height: 10),
         if (state.progress.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: Center(child: Text(l10n.noEnvelopes)),
           )
         else
-          ...state.progress.map((p) => _CategoryProgressTile(progress: p)),
+          for (final p in state.progress) ...[
+            _CategoryProgressTile(progress: p),
+            const SizedBox(height: 10),
+          ],
       ],
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFFE4E4E7),
+      ),
     );
   }
 }
@@ -169,36 +263,46 @@ class _SummaryCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
               children: [
-                _Stat(label: l10n.income, value: formatZloty(state.income)),
-                _Stat(
-                  label: l10n.planned,
-                  value: formatZloty(state.totalPlanned),
+                Expanded(
+                  child: _Stat(
+                    label: l10n.income,
+                    value: formatZloty(state.income),
+                  ),
                 ),
-                _Stat(label: l10n.spent, value: formatZloty(state.totalSpent)),
+                Expanded(
+                  child: _Stat(
+                    label: l10n.planned,
+                    value: formatZloty(state.totalPlanned),
+                  ),
+                ),
               ],
             ),
-            const Divider(height: 24),
+            const Divider(height: 28),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   state.isOverAllocated ? l10n.overAllocated : l10n.unallocated,
                   style: TextStyle(
-                    color: state.isOverAllocated ? scheme.error : null,
-                    fontWeight: FontWeight.w500,
+                    color: state.isOverAllocated
+                        ? scheme.error
+                        : scheme.onSurfaceVariant,
+                    fontSize: 13,
                   ),
                 ),
                 Text(
                   formatZloty(state.unallocated),
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: state.isOverAllocated ? scheme.error : null,
+                    fontWeight: FontWeight.w700,
+                    color: state.isOverAllocated
+                        ? scheme.error
+                        : scheme.onSurface,
                   ),
                 ),
               ],
@@ -217,20 +321,24 @@ class _Stat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: Theme.of(context).textTheme.labelMedium),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.4,
+            color: Color(0xFF71717A),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        ),
+      ],
     );
   }
 }
@@ -241,14 +349,10 @@ class _CategoryProgressTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final color = progress.category.displayColor;
 
     return Card(
-      elevation: 0,
-      color: scheme.surfaceContainerHighest,
-      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(
@@ -256,18 +360,22 @@ class _CategoryProgressTile extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundColor: color.withValues(alpha: 0.2),
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.16),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: Icon(
                       progress.category.displayIcon,
-                      size: 18,
+                      size: 17,
                       color: color,
                     ),
                   ),
@@ -275,36 +383,29 @@ class _CategoryProgressTile extends StatelessWidget {
                   Expanded(
                     child: Text(
                       progress.category.name,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   Text(
                     '${formatZloty(progress.spent)} / ${formatZloty(progress.planned)}',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               ClipRRect(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(99),
                 child: LinearProgressIndicator(
                   value: progress.fraction,
-                  minHeight: 8,
-                  backgroundColor: scheme.surfaceContainerHigh,
+                  minHeight: 5,
+                  backgroundColor: scheme.surfaceContainerHighest,
                   color: progress.isOverspent ? scheme.error : color,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  progress.isOverspent
-                      ? l10n.overBy(formatZloty(-progress.remaining))
-                      : l10n.amountLeft(formatZloty(progress.remaining)),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: progress.isOverspent ? scheme.error : null,
-                  ),
                 ),
               ),
             ],

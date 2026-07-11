@@ -19,9 +19,9 @@ class MoneyPlannerApp extends StatelessWidget {
       child: MaterialApp(
         onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
+        theme: AppTheme.theme,
+        darkTheme: AppTheme.theme,
+        themeMode: ThemeMode.dark,
         locale: const Locale('pl'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,

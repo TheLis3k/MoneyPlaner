@@ -7,15 +7,18 @@ import '../../../theme/category_visuals.dart';
 import '../../../util/money_format.dart';
 import '../../../widgets/chart_card.dart';
 
-/// Donut chart of how the period's income is planned across categories.
+/// Donut chart of how the period's income is planned across categories, with
+/// the amount spent called out in the centre.
 class PlannedPieChart extends StatelessWidget {
-  const PlannedPieChart({super.key, required this.progress});
+  const PlannedPieChart({super.key, required this.progress, this.spent = 0});
 
   final List<CategoryProgress> progress;
+  final double spent;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     final items = progress.where((p) => p.planned > 0).toList();
     final total = items.fold<double>(0, (sum, p) => sum + p.planned);
 
@@ -31,26 +34,46 @@ class PlannedPieChart extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(
-            height: 170,
-            child: PieChart(
-              PieChartData(
-                sectionsSpace: 2,
-                centerSpaceRadius: 40,
-                sections: [
-                  for (final p in items)
-                    PieChartSectionData(
-                      value: p.planned,
-                      color: p.category.displayColor,
-                      title: '${(p.planned / total * 100).round()}%',
-                      radius: 46,
-                      titleStyle: const TextStyle(
+            height: 190,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                PieChart(
+                  PieChartData(
+                    sectionsSpace: 2,
+                    centerSpaceRadius: 52,
+                    sections: [
+                      for (final p in items)
+                        PieChartSectionData(
+                          value: p.planned,
+                          color: p.category.displayColor,
+                          showTitle: false,
+                          radius: 26,
+                        ),
+                    ],
+                  ),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.spent,
+                      style: TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: scheme.onSurfaceVariant,
                       ),
                     ),
-                ],
-              ),
+                    const SizedBox(height: 2),
+                    Text(
+                      formatZloty(spent),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
