@@ -378,6 +378,61 @@ class AppLocalizationsPl extends AppLocalizations {
   String get restore => 'Przywróć';
 
   @override
+  String get general => 'Ogólne';
+
+  @override
+  String get appearance => 'Wygląd';
+
+  @override
+  String get dataSection => 'Dane';
+
+  @override
+  String get currency => 'Waluta';
+
+  @override
+  String get firstDayOfMonth => 'Pierwszy dzień miesiąca';
+
+  @override
+  String get theme => 'Motyw';
+
+  @override
+  String get themeDark => 'Ciemny';
+
+  @override
+  String get themeLight => 'Jasny';
+
+  @override
+  String get themeAuto => 'Auto';
+
+  @override
+  String get exportCsv => 'Eksportuj dane (CSV)';
+
+  @override
+  String get backup => 'Kopia zapasowa';
+
+  @override
+  String get about => 'O aplikacji';
+
+  @override
+  String csvExported(String path) {
+    return 'Wyeksportowano do $path';
+  }
+
+  @override
+  String get today => 'Dziś';
+
+  @override
+  String get noteHint => 'np. Zakupy tygodniowe';
+
+  @override
+  String get addNew => 'Nowa';
+
+  @override
+  String remainingInCategory(String category) {
+    return 'Pozostało w $category';
+  }
+
+  @override
   String get history => 'Historia';
 
   @override

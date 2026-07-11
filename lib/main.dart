@@ -3,6 +3,7 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'app.dart';
 import 'data/database_helper.dart';
+import 'state/app_settings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,5 +15,8 @@ Future<void> main() async {
   // first screen doesn't pay the initialisation cost.
   await DatabaseHelper.instance.database;
 
-  runApp(const MoneyPlannerApp());
+  final settings = AppSettings();
+  await settings.load();
+
+  runApp(MoneyPlannerApp(settings: settings));
 }

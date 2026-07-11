@@ -376,6 +376,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restore => 'Restore';
 
   @override
+  String get general => 'General';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get dataSection => 'Data';
+
+  @override
+  String get currency => 'Currency';
+
+  @override
+  String get firstDayOfMonth => 'First day of month';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeAuto => 'Auto';
+
+  @override
+  String get exportCsv => 'Export data (CSV)';
+
+  @override
+  String get backup => 'Backup';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String csvExported(String path) {
+    return 'Exported to $path';
+  }
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get noteHint => 'e.g. Weekly groceries';
+
+  @override
+  String get addNew => 'New';
+
+  @override
+  String remainingInCategory(String category) {
+    return 'Remaining in $category';
+  }
+
+  @override
   String get history => 'History';
 
   @override

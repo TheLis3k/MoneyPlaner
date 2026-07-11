@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/category.dart';
 import '../../models/period.dart';
+import '../../state/app_settings.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
@@ -64,10 +65,16 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
       }
     } else {
       final now = DateTime.now();
-      _startDate = DateTime(now.year, now.month, 1);
-      _endDate = DateTime(now.year, now.month + 1, 0); // last day of month
+      final firstDay = context.read<AppSettings>().firstDayOfMonth;
+      _startDate = DateTime(now.year, now.month, firstDay);
+      // End = the day before the next period's start.
+      _endDate = DateTime(
+        now.year,
+        now.month + 1,
+        firstDay,
+      ).subtract(const Duration(days: 1));
       _nameController.text = toBeginningOfSentenceCase(
-        DateFormat.yMMMM('pl').format(now),
+        DateFormat.yMMMM('pl').format(_startDate),
       );
     }
   }

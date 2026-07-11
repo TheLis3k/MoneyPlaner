@@ -150,6 +150,30 @@
   },
   "restore": "Restore",
 
+  "general": "General",
+  "appearance": "Appearance",
+  "dataSection": "Data",
+  "currency": "Currency",
+  "firstDayOfMonth": "First day of month",
+  "theme": "Theme",
+  "themeDark": "Dark",
+  "themeLight": "Light",
+  "themeAuto": "Auto",
+  "exportCsv": "Export data (CSV)",
+  "backup": "Backup",
+  "about": "About",
+  "csvExported": "Exported to {path}",
+  "@csvExported": {
+    "placeholders": { "path": { "type": "String" } }
+  },
+  "today": "Today",
+  "noteHint": "e.g. Weekly groceries",
+  "addNew": "New",
+  "remainingInCategory": "Remaining in {category}",
+  "@remainingInCategory": {
+    "placeholders": { "category": { "type": "String" } }
+  },
+
   "history": "History",
   "noPeriodsYet": "No periods yet.",
   "deletePeriod": "Delete period",

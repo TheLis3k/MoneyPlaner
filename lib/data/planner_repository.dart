@@ -243,6 +243,21 @@ class PlannerRepository {
     };
   }
 
+  /// Flat rows for CSV export: one line per expense with human-readable period
+  /// and category names.
+  Future<List<Map<String, Object?>>> expenseExportRows() async {
+    final db = await _db;
+    return db.rawQuery('''
+      SELECT p.name AS period, c.name AS category, e.amount AS amount,
+             e.date AS date, e.note AS note
+      FROM expenses e
+      JOIN splits s ON s.id = e.split_id
+      JOIN periods p ON p.id = s.period_id
+      JOIN categories c ON c.id = s.category_id
+      ORDER BY e.date DESC
+    ''');
+  }
+
   // -------------------------------------------------------------- export/import
 
   /// Tables in parent-first order (safe to insert in this order).

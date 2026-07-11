@@ -1,58 +1,51 @@
 import 'package:flutter/material.dart';
 
-/// Dark, shadcn-inspired theme: near-black surfaces, hairline borders,
-/// near-white primary actions, generous rounding. Applied app-wide.
+/// shadcn-inspired themes (dark + light): flat surfaces, hairline borders,
+/// near-mono primary actions, Inter type, generous rounding.
 class AppTheme {
-  // Core palette (Zinc scale + accents), matching the design comp.
-  static const _bg = Color(0xFF09090B); // scaffold / app bar
-  static const _card = Color(0xFF131316); // cards, sheets
-  static const _border = Color(0xFF1F1F23); // hairline card border
-  static const _track = Color(0xFF27272A); // progress track, dividers
-  static const _fg = Color(0xFFFAFAFA); // primary text / CTA
-  static const _muted = Color(0xFFA1A1AA); // secondary text
-  static const _faint = Color(0xFF71717A); // inactive / labels
+  static ThemeData get theme => dark;
+  static ThemeData get dark => _build(_DarkPalette());
+  static ThemeData get light => _build(_LightPalette());
 
-  static final ColorScheme _scheme = const ColorScheme.dark().copyWith(
-    primary: _fg,
-    onPrimary: _bg,
-    primaryContainer: _track,
-    onPrimaryContainer: _fg,
-    secondary: _muted,
-    onSecondary: _bg,
-    surface: _bg,
-    onSurface: _fg,
-    onSurfaceVariant: _muted,
-    surfaceContainerLowest: _bg,
-    surfaceContainerLow: _card,
-    surfaceContainer: _card,
-    surfaceContainerHigh: _border,
-    surfaceContainerHighest: _track,
-    outline: Color(0xFF3F3F46),
-    outlineVariant: _track,
-    error: Color(0xFFF87171),
-    onError: _bg,
-    errorContainer: Color(0xFF4C0519),
-    onErrorContainer: Color(0xFFFECDD3),
-  );
+  static ThemeData _build(_Palette p) {
+    final scheme =
+        (p.brightness == Brightness.dark
+                ? const ColorScheme.dark()
+                : const ColorScheme.light())
+            .copyWith(
+              brightness: p.brightness,
+              primary: p.primary,
+              onPrimary: p.onPrimary,
+              primaryContainer: p.track,
+              onPrimaryContainer: p.fg,
+              secondary: p.muted,
+              onSecondary: p.onPrimary,
+              surface: p.bg,
+              onSurface: p.fg,
+              onSurfaceVariant: p.muted,
+              surfaceContainerLowest: p.bg,
+              surfaceContainerLow: p.card,
+              surfaceContainer: p.card,
+              surfaceContainerHigh: p.border,
+              surfaceContainerHighest: p.track,
+              outline: p.outline,
+              outlineVariant: p.track,
+              error: p.error,
+              onError: p.onPrimary,
+              errorContainer: p.errorContainer,
+              onErrorContainer: p.onErrorContainer,
+            );
 
-  static ThemeData get theme => _build();
-
-  // Kept for the app's existing references; both resolve to the dark theme.
-  static ThemeData get dark => _build();
-  static ThemeData get light => _build();
-
-  static ThemeData _build() {
     final base = ThemeData(
-      brightness: Brightness.dark,
-      colorScheme: _scheme,
-      scaffoldBackgroundColor: _bg,
+      brightness: p.brightness,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: p.bg,
       useMaterial3: true,
       fontFamily: 'Inter',
     );
 
-    // Inter with slightly tightened tracking on larger text — the shadcn feel.
     final text = base.textTheme
-        .apply(bodyColor: _fg, displayColor: _fg)
+        .apply(bodyColor: p.fg, displayColor: p.fg)
         .copyWith(
           titleLarge: base.textTheme.titleLarge?.copyWith(
             letterSpacing: -0.3,
@@ -70,108 +63,188 @@ class AppTheme {
 
     return base.copyWith(
       textTheme: text,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: _bg,
-        foregroundColor: _fg,
+      appBarTheme: AppBarTheme(
+        backgroundColor: p.bg,
+        foregroundColor: p.fg,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
       ),
       cardTheme: CardThemeData(
-        color: _card,
+        color: p.card,
         elevation: 0,
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: _border),
+          side: BorderSide(color: p.border),
         ),
       ),
-      dividerTheme: const DividerThemeData(color: _track, thickness: 1),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: _fg,
-        foregroundColor: _bg,
+      dividerTheme: DividerThemeData(color: p.track, thickness: 1),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: p.primary,
+        foregroundColor: p.onPrimary,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: _fg,
-          foregroundColor: _bg,
+          backgroundColor: p.primary,
+          foregroundColor: p.onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: _bg,
+        backgroundColor: p.bg,
         indicatorColor: Colors.transparent,
         elevation: 0,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => IconThemeData(
             size: 22,
-            color: states.contains(WidgetState.selected) ? _fg : _faint,
+            color: states.contains(WidgetState.selected) ? p.fg : p.faint,
           ),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) => TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: states.contains(WidgetState.selected) ? _fg : _faint,
+            color: states.contains(WidgetState.selected) ? p.fg : p.faint,
           ),
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: _card,
+        backgroundColor: p.card,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: _border),
+          side: BorderSide(color: p.border),
         ),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: _card,
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: p.card,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: _card,
+        color: p.card,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: _border),
+          side: BorderSide(color: p.border),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: _fg,
-          side: const BorderSide(color: _track),
+          foregroundColor: p.fg,
+          side: BorderSide(color: p.track),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
       ),
-      listTileTheme: const ListTileThemeData(iconColor: _muted),
+      listTileTheme: ListTileThemeData(iconColor: p.muted),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: _card,
+        fillColor: p.card,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _track),
+          borderSide: BorderSide(color: p.track),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _track),
+          borderSide: BorderSide(color: p.track),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _fg, width: 1.5),
+          borderSide: BorderSide(color: p.fg, width: 1.5),
         ),
       ),
-      snackBarTheme: const SnackBarThemeData(
-        backgroundColor: _card,
-        contentTextStyle: TextStyle(color: _fg),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: p.card,
+        contentTextStyle: TextStyle(color: p.fg),
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
+}
+
+/// Palette knobs shared by both themes.
+abstract class _Palette {
+  Brightness get brightness;
+  Color get bg;
+  Color get card;
+  Color get border;
+  Color get track;
+  Color get fg;
+  Color get muted;
+  Color get faint;
+  Color get primary;
+  Color get onPrimary;
+  Color get outline;
+  Color get error;
+  Color get errorContainer;
+  Color get onErrorContainer;
+}
+
+class _DarkPalette implements _Palette {
+  @override
+  final brightness = Brightness.dark;
+  @override
+  final bg = const Color(0xFF09090B);
+  @override
+  final card = const Color(0xFF131316);
+  @override
+  final border = const Color(0xFF1F1F23);
+  @override
+  final track = const Color(0xFF27272A);
+  @override
+  final fg = const Color(0xFFFAFAFA);
+  @override
+  final muted = const Color(0xFFA1A1AA);
+  @override
+  final faint = const Color(0xFF71717A);
+  @override
+  final primary = const Color(0xFFFAFAFA);
+  @override
+  final onPrimary = const Color(0xFF09090B);
+  @override
+  final outline = const Color(0xFF3F3F46);
+  @override
+  final error = const Color(0xFFF87171);
+  @override
+  final errorContainer = const Color(0xFF4C0519);
+  @override
+  final onErrorContainer = const Color(0xFFFECDD3);
+}
+
+class _LightPalette implements _Palette {
+  @override
+  final brightness = Brightness.light;
+  @override
+  final bg = const Color(0xFFF4F4F5);
+  @override
+  final card = const Color(0xFFFFFFFF);
+  @override
+  final border = const Color(0xFFE4E4E7);
+  @override
+  final track = const Color(0xFFE4E4E7);
+  @override
+  final fg = const Color(0xFF09090B);
+  @override
+  final muted = const Color(0xFF52525B);
+  @override
+  final faint = const Color(0xFF71717A);
+  @override
+  final primary = const Color(0xFF18181B);
+  @override
+  final onPrimary = const Color(0xFFFAFAFA);
+  @override
+  final outline = const Color(0xFFD4D4D8);
+  @override
+  final error = const Color(0xFFDC2626);
+  @override
+  final errorContainer = const Color(0xFFFEE2E2);
+  @override
+  final onErrorContainer = const Color(0xFF7F1D1D);
 }

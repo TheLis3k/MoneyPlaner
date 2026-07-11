@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../services/auth_service.dart';
-import '../../services/sync_manager.dart';
-import '../../state/planner_state.dart';
+import '../../services/csv_exporter.dart';
+import '../../state/app_settings.dart';
 import '../categories/categories_screen.dart';
-import 'sync_setup_screen.dart';
+import 'backup_screen.dart';
 
-/// Settings — currently the Security section: PIN lock and biometric unlock.
+/// App settings: general, appearance, security, data.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -20,15 +19,11 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final AuthService _auth = AuthService();
-  final SyncManager _sync = SyncManager();
 
   bool _loading = true;
   bool _hasPin = false;
   bool _biometricAvailable = false;
   bool _biometricEnabled = false;
-
-  SyncSettings? _syncSettings;
-  bool _syncing = false;
 
   @override
   void initState() {
@@ -40,16 +35,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final hasPin = await _auth.hasPin();
     final available = await _auth.canUseBiometrics();
     final enabled = await _auth.isBiometricEnabled();
-    final syncSettings = await _sync.loadSettings();
     if (!mounted) return;
     setState(() {
       _hasPin = hasPin;
       _biometricAvailable = available;
       _biometricEnabled = enabled;
-      _syncSettings = syncSettings;
       _loading = false;
     });
   }
+
+  // ---- security -------------------------------------------------------------
 
   Future<void> _toggleLock(bool enable) async {
     final l10n = AppLocalizations.of(context);
@@ -80,206 +75,251 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) setState(() => _biometricEnabled = enabled);
   }
 
-  Future<String?> _showPinSetup() {
-    return showDialog<String>(
-      context: context,
-      builder: (_) => const _PinSetupDialog(),
-    );
-  }
+  Future<String?> _showPinSetup() => showDialog<String>(
+    context: context,
+    builder: (_) => const _PinSetupDialog(),
+  );
 
-  // ---- cloud sync -----------------------------------------------------------
+  // ---- data -----------------------------------------------------------------
 
-  Future<void> _setUpSync() async {
-    final configured = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (_) => SyncSetupScreen(sync: _sync)),
-    );
-    if (configured == true) await _load();
-  }
-
-  Future<void> _syncNow() async {
+  Future<void> _exportCsv() async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    setState(() => _syncing = true);
-    try {
-      await _sync.push();
-      await _load();
-      messenger.showSnackBar(SnackBar(content: Text(l10n.syncComplete)));
-    } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.syncFailed('$e'))));
-    } finally {
-      if (mounted) setState(() => _syncing = false);
-    }
+    final path = await CsvExporter().exportToFile();
+    messenger.showSnackBar(SnackBar(content: Text(l10n.csvExported(path))));
   }
 
-  Future<void> _restore() async {
-    final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    final planner = context.read<PlannerState>();
-
-    final confirmed = await showDialog<bool>(
+  Future<void> _pickFirstDay(AppSettings settings) async {
+    final selected = await showDialog<int>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.restoreWarningTitle),
-        content: Text(l10n.restoreWarningBody),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.restore),
+      builder: (ctx) => SimpleDialog(
+        title: Text(AppLocalizations.of(context).firstDayOfMonth),
+        children: [
+          SizedBox(
+            width: 300,
+            height: 320,
+            child: GridView.count(
+              crossAxisCount: 7,
+              padding: const EdgeInsets.all(12),
+              children: [
+                for (var d = 1; d <= 28; d++)
+                  InkWell(
+                    onTap: () => Navigator.of(ctx).pop(d),
+                    child: Center(
+                      child: Text(
+                        '$d',
+                        style: TextStyle(
+                          fontWeight: d == settings.firstDayOfMonth
+                              ? FontWeight.bold
+                              : null,
+                          color: d == settings.firstDayOfMonth
+                              ? Theme.of(context).colorScheme.primary
+                              : null,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
     );
-    if (confirmed != true) return;
-
-    setState(() => _syncing = true);
-    try {
-      final restored = await _sync.pull();
-      if (restored) await planner.load();
-      await _load();
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            restored ? l10n.restoreComplete : l10n.nothingToRestore,
-          ),
-        ),
-      );
-    } catch (e) {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.syncFailed('$e'))));
-    } finally {
-      if (mounted) setState(() => _syncing = false);
-    }
-  }
-
-  Future<void> _disconnect() async {
-    await _sync.disconnect();
-    await _load();
+    if (selected != null) await settings.setFirstDayOfMonth(selected);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.settings)),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.grid_view_outlined),
-                  title: Text(l10n.manageCategories),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const CategoriesScreen()),
-                  ),
-                ),
-                const Divider(),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-                  child: Text(
-                    l10n.security,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
-                SwitchListTile(
-                  secondary: const Icon(Icons.lock_outline),
-                  title: Text(l10n.appLock),
-                  subtitle: Text(l10n.appLockSubtitle),
-                  value: _hasPin,
-                  onChanged: _toggleLock,
-                ),
-                if (_hasPin)
-                  ListTile(
-                    leading: const Icon(Icons.pin_outlined),
-                    title: Text(l10n.changePin),
-                    onTap: _changePin,
-                  ),
-                if (_hasPin && _biometricAvailable)
-                  SwitchListTile(
-                    secondary: const Icon(Icons.fingerprint),
-                    title: Text(l10n.biometricUnlock),
-                    value: _biometricEnabled,
-                    onChanged: _toggleBiometric,
-                  ),
-                const Divider(),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                  child: Text(
-                    l10n.cloudSync,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                ),
-                ..._buildSyncSection(l10n),
-              ],
-            ),
-    );
-  }
+    final settings = context.watch<AppSettings>();
 
-  List<Widget> _buildSyncSection(AppLocalizations l10n) {
-    final settings = _syncSettings;
-    if (settings == null) {
-      return [
-        ListTile(
-          leading: const Icon(Icons.cloud_upload_outlined),
-          title: Text(l10n.setUpSync),
-          subtitle: Text(l10n.syncSubtitle),
-          onTap: _setUpSync,
-        ),
-      ];
+    if (_loading) {
+      return Scaffold(
+        appBar: AppBar(title: Text(l10n.settings)),
+        body: const Center(child: CircularProgressIndicator()),
+      );
     }
 
-    final lastSync = settings.lastSync == null
-        ? l10n.neverSynced
-        : l10n.lastSynced(
-            DateFormat.yMMMd('pl').add_Hm().format(settings.lastSync!),
-          );
-
-    return [
-      ListTile(
-        leading: const Icon(Icons.cloud_done_outlined),
-        title: Text(settings.repoLabel),
-        subtitle: Text('${settings.path} · $lastSync'),
-      ),
-      if (_syncing)
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
-          child: Center(child: CircularProgressIndicator()),
-        )
-      else
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.settings)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        children: [
+          // ---- General ----
+          _SectionHeader(l10n.general),
+          _Group(
             children: [
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: _syncNow,
-                  icon: const Icon(Icons.sync),
-                  label: Text(l10n.syncNow),
-                ),
+              ListTile(
+                leading: const Icon(Icons.payments_outlined),
+                title: Text(l10n.currency),
+                trailing: const Text('PLN (zł)'),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _restore,
-                  icon: const Icon(Icons.cloud_download_outlined),
-                  label: Text(l10n.restoreFromCloud),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.event_outlined),
+                title: Text(l10n.firstDayOfMonth),
+                trailing: Text('${settings.firstDayOfMonth}'),
+                onTap: () => _pickFirstDay(settings),
+              ),
+            ],
+          ),
+
+          // ---- Appearance ----
+          _SectionHeader(l10n.appearance),
+          _Group(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.theme,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: SegmentedButton<ThemeMode>(
+                        segments: [
+                          ButtonSegment(
+                            value: ThemeMode.dark,
+                            label: Text(l10n.themeDark),
+                          ),
+                          ButtonSegment(
+                            value: ThemeMode.light,
+                            label: Text(l10n.themeLight),
+                          ),
+                          ButtonSegment(
+                            value: ThemeMode.system,
+                            label: Text(l10n.themeAuto),
+                          ),
+                        ],
+                        selected: {settings.themeMode},
+                        showSelectedIcon: false,
+                        onSelectionChanged: (s) =>
+                            settings.setThemeMode(s.first),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: TextButton.icon(
-          onPressed: _disconnect,
-          icon: const Icon(Icons.link_off),
-          label: Text(l10n.disconnect),
+
+          // ---- Security ----
+          _SectionHeader(l10n.security),
+          _Group(
+            children: [
+              SwitchListTile(
+                secondary: const Icon(Icons.lock_outline),
+                title: Text(l10n.appLock),
+                subtitle: Text(l10n.appLockSubtitle),
+                value: _hasPin,
+                onChanged: _toggleLock,
+              ),
+              if (_hasPin) ...[
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.pin_outlined),
+                  title: Text(l10n.changePin),
+                  onTap: _changePin,
+                ),
+              ],
+              if (_hasPin && _biometricAvailable) ...[
+                const Divider(height: 1),
+                SwitchListTile(
+                  secondary: const Icon(Icons.fingerprint),
+                  title: Text(l10n.biometricUnlock),
+                  value: _biometricEnabled,
+                  onChanged: _toggleBiometric,
+                ),
+              ],
+            ],
+          ),
+
+          // ---- Data ----
+          _SectionHeader(l10n.dataSection),
+          _Group(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.file_download_outlined),
+                title: Text(l10n.exportCsv),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: _exportCsv,
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.cloud_outlined),
+                title: Text(l10n.backup),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => const BackupScreen())),
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.grid_view_outlined),
+                title: Text(l10n.manageCategories),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+          _Group(
+            children: [
+              ListTile(
+                title: Text(l10n.about),
+                trailing: Text(
+                  'v1.0.0',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
+      child: Text(
+        text.toUpperCase(),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.6,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
       ),
-    ];
+    );
+  }
+}
+
+/// A card that groups related rows, like the design's rounded sections.
+class _Group extends StatelessWidget {
+  const _Group({required this.children});
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(mainAxisSize: MainAxisSize.min, children: children),
+    );
   }
 }
 

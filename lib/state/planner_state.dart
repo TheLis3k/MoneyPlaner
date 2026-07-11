@@ -226,6 +226,22 @@ class PlannerState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Creates a category and immediately makes it an envelope (planned 0) in the
+  /// current period, so it can be spent against right away. Returns the new
+  /// split id, or null if there is no current period.
+  Future<int?> quickAddEnvelope(Category category) async {
+    final period = _currentPeriod;
+    if (period?.id == null) return null;
+    final categoryId = await _repo.insertCategory(category);
+    final splitId = await _repo.insertSplit(
+      Split(periodId: period!.id!, categoryId: categoryId, plannedAmount: 0),
+    );
+    _categories = await _repo.getCategories();
+    await _refreshProgress();
+    notifyListeners();
+    return splitId;
+  }
+
   Future<void> updateCategory(Category category) async {
     await _repo.updateCategory(category);
     _categories = await _repo.getCategories();
