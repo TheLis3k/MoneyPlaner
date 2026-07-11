@@ -120,6 +120,61 @@ class PlannerState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Edits the current period's income and per-category allocations.
+  ///
+  /// For each category: allocates/updates a split when the amount is positive;
+  /// when the amount is zero it removes the split — unless money was already
+  /// spent against it, in which case the split is kept at 0 so history stays
+  /// intact.
+  Future<void> editCurrentPeriodPlan({
+    required double income,
+    required Map<int, double> plannedByCategory,
+  }) async {
+    final period = _currentPeriod;
+    if (period?.id == null) return;
+
+    await _repo.updatePeriod(period!.copyWith(income: income));
+
+    final existing = {
+      for (final s in await _repo.getSplitsForPeriod(period.id!))
+        s.categoryId: s,
+    };
+
+    for (final entry in plannedByCategory.entries) {
+      final split = existing[entry.key];
+      if (entry.value > 0) {
+        if (split == null) {
+          await _repo.insertSplit(
+            Split(
+              periodId: period.id!,
+              categoryId: entry.key,
+              plannedAmount: entry.value,
+            ),
+          );
+        } else if (split.plannedAmount != entry.value) {
+          await _repo.updateSplit(split.copyWith(plannedAmount: entry.value));
+        }
+      } else if (split != null) {
+        final hasExpenses = (await _repo.getExpensesForSplit(
+          split.id!,
+        )).isNotEmpty;
+        if (hasExpenses) {
+          await _repo.updateSplit(split.copyWith(plannedAmount: 0));
+        } else {
+          await _repo.deleteSplit(split.id!);
+        }
+      }
+    }
+
+    _periods = await _repo.getPeriods();
+    _currentPeriod = _periods.firstWhere(
+      (p) => p.id == period.id,
+      orElse: () => period,
+    );
+    await _refreshProgress();
+    notifyListeners();
+  }
+
   Future<void> addExpense({
     required int splitId,
     required double amount,

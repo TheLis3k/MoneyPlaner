@@ -41,6 +41,8 @@
     "placeholders": { "amount": { "type": "String" } }
   },
   "createPeriod": "Create period",
+  "editPlan": "Edit plan",
+  "saveChanges": "Save changes",
 
   "noEnvelopesForExpense": "This period has no envelopes yet. Add categories to the period before logging expenses.",
   "envelope": "Envelope",

@@ -4,18 +4,29 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/category.dart';
+import '../../models/period.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
 import '../categories/category_editor.dart';
 
-/// Set up a new planning period: name, date range, income, and how that income
-/// is split across categories. Over-allocation is warned about, never blocked.
+/// Set up a new planning period, or edit the current period's plan when
+/// [editPeriod] is provided. Income and per-category allocations are editable;
+/// over-allocation is warned about, never blocked.
 class NewPeriodScreen extends StatefulWidget {
-  const NewPeriodScreen({super.key});
+  const NewPeriodScreen({super.key, this.editPeriod});
+
+  /// When non-null, the screen edits this (current) period instead of creating
+  /// a new one.
+  final Period? editPeriod;
 
   @override
   State<NewPeriodScreen> createState() => _NewPeriodScreenState();
+}
+
+String _amountText(double v) {
+  final s = v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
+  return s.replaceAll('.', ',');
 }
 
 double _parseAmount(String raw) =>
@@ -34,15 +45,31 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
 
   bool _saving = false;
 
+  bool get _isEdit => widget.editPeriod != null;
+
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    _startDate = DateTime(now.year, now.month, 1);
-    _endDate = DateTime(now.year, now.month + 1, 0); // last day of month
-    _nameController.text = toBeginningOfSentenceCase(
-      DateFormat.yMMMM('pl').format(now),
-    );
+    final edit = widget.editPeriod;
+    if (edit != null) {
+      _nameController.text = edit.name;
+      _startDate = edit.startDate;
+      _endDate = edit.endDate;
+      _incomeController.text = _amountText(edit.income);
+      // Pre-fill existing allocations from the current period's progress.
+      for (final cp in context.read<PlannerState>().progress) {
+        _plannedControllers[cp.category.id!] = TextEditingController(
+          text: _amountText(cp.planned),
+        );
+      }
+    } else {
+      final now = DateTime.now();
+      _startDate = DateTime(now.year, now.month, 1);
+      _endDate = DateTime(now.year, now.month + 1, 0); // last day of month
+      _nameController.text = toBeginningOfSentenceCase(
+        DateFormat.yMMMM('pl').format(now),
+      );
+    }
   }
 
   @override
@@ -71,19 +98,28 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _saving = true);
-    final planned = <int, double>{};
-    _plannedControllers.forEach((categoryId, controller) {
-      final value = _parseAmount(controller.text);
-      if (value > 0) planned[categoryId] = value;
-    });
+    final state = context.read<PlannerState>();
 
-    await context.read<PlannerState>().createPeriod(
-      name: _nameController.text.trim(),
-      startDate: _startDate,
-      endDate: _endDate,
-      income: _income,
-      plannedByCategory: planned,
-    );
+    // Include every category (0 included) so edits can also clear allocations.
+    final planned = <int, double>{
+      for (final entry in _plannedControllers.entries)
+        entry.key: _parseAmount(entry.value.text),
+    };
+
+    if (_isEdit) {
+      await state.editCurrentPeriodPlan(
+        income: _income,
+        plannedByCategory: planned,
+      );
+    } else {
+      await state.createPeriod(
+        name: _nameController.text.trim(),
+        startDate: _startDate,
+        endDate: _endDate,
+        income: _income,
+        plannedByCategory: planned,
+      );
+    }
 
     if (mounted) Navigator.of(context).pop();
   }
@@ -116,45 +152,47 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
     final dateFmt = DateFormat.yMMMd('pl');
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.newPeriod)),
+      appBar: AppBar(title: Text(_isEdit ? l10n.editPlan : l10n.newPeriod)),
       body: Form(
         key: _formKey,
         onChanged: () => setState(() {}),
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: l10n.periodName,
-                border: const OutlineInputBorder(),
+            if (!_isEdit) ...[
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: l10n.periodName,
+                  border: const OutlineInputBorder(),
+                ),
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? l10n.enterName : null,
               ),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? l10n.enterName : null,
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _DateField(
-                    label: l10n.start,
-                    date: _startDate,
-                    format: dateFmt,
-                    onPick: (d) => setState(() => _startDate = d),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _DateField(
+                      label: l10n.start,
+                      date: _startDate,
+                      format: dateFmt,
+                      onPick: (d) => setState(() => _startDate = d),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _DateField(
-                    label: l10n.end,
-                    date: _endDate,
-                    format: dateFmt,
-                    onPick: (d) => setState(() => _endDate = d),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _DateField(
+                      label: l10n.end,
+                      date: _endDate,
+                      format: dateFmt,
+                      onPick: (d) => setState(() => _endDate = d),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ],
             TextFormField(
               controller: _incomeController,
               keyboardType: const TextInputType.numberWithOptions(
@@ -219,7 +257,7 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.check),
-              label: Text(l10n.createPeriod),
+              label: Text(_isEdit ? l10n.saveChanges : l10n.createPeriod),
             ),
           ],
         ),

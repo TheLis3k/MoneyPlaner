@@ -29,6 +29,8 @@
   "splitAcrossCategories": "Podziel na kategorie",
   "overAllocationWarning": "Przydzielono o {amount} więcej niż wynosi dochód. Możesz mimo to kontynuować.",
   "createPeriod": "Utwórz okres",
+  "editPlan": "Edytuj plan",
+  "saveChanges": "Zapisz zmiany",
 
   "noEnvelopesForExpense": "Ten okres nie ma jeszcze żadnych kopert. Dodaj kategorie do okresu, zanim zapiszesz wydatki.",
   "envelope": "Koperta",

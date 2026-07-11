@@ -248,6 +248,18 @@ abstract class AppLocalizations {
   /// **'Create period'**
   String get createPeriod;
 
+  /// No description provided for @editPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit plan'**
+  String get editPlan;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get saveChanges;
+
   /// No description provided for @noEnvelopesForExpense.
   ///
   /// In en, this message translates to:

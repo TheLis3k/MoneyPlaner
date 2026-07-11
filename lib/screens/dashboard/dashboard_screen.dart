@@ -43,6 +43,16 @@ class DashboardScreen extends StatelessWidget {
                 ],
               ),
         actions: [
+          if (period != null)
+            IconButton(
+              tooltip: l10n.editPlan,
+              icon: const Icon(Icons.tune),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => NewPeriodScreen(editPeriod: period),
+                ),
+              ),
+            ),
           IconButton(
             tooltip: l10n.recurringRules,
             icon: const Icon(Icons.repeat),

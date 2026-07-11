@@ -93,6 +93,12 @@ class AppLocalizationsPl extends AppLocalizations {
   String get createPeriod => 'Utwórz okres';
 
   @override
+  String get editPlan => 'Edytuj plan';
+
+  @override
+  String get saveChanges => 'Zapisz zmiany';
+
+  @override
   String get noEnvelopesForExpense =>
       'Ten okres nie ma jeszcze żadnych kopert. Dodaj kategorie do okresu, zanim zapiszesz wydatki.';
 

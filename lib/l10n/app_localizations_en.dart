@@ -93,6 +93,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createPeriod => 'Create period';
 
   @override
+  String get editPlan => 'Edit plan';
+
+  @override
+  String get saveChanges => 'Save changes';
+
+  @override
   String get noEnvelopesForExpense =>
       'This period has no envelopes yet. Add categories to the period before logging expenses.';
 

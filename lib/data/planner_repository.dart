@@ -77,6 +77,16 @@ class PlannerRepository {
     return db.insert('periods', period.toMap()..remove('id'));
   }
 
+  Future<void> updatePeriod(Period period) async {
+    final db = await _db;
+    await db.update(
+      'periods',
+      period.toMap(),
+      where: 'id = ?',
+      whereArgs: [period.id],
+    );
+  }
+
   // -------------------------------------------------------------------- splits
 
   Future<List<Split>> getSplitsForPeriod(int periodId) async {
@@ -92,6 +102,16 @@ class PlannerRepository {
   Future<int> insertSplit(Split split) async {
     final db = await _db;
     return db.insert('splits', split.toMap()..remove('id'));
+  }
+
+  Future<void> updateSplit(Split split) async {
+    final db = await _db;
+    await db.update(
+      'splits',
+      split.toMap(),
+      where: 'id = ?',
+      whereArgs: [split.id],
+    );
   }
 
   Future<void> deleteSplit(int splitId) async {
