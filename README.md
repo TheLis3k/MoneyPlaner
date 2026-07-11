@@ -133,7 +133,7 @@ flutter test
 - [x] **Phase 0** — Project scaffold, data model, SQLite schema
 - [x] **Phase 1** — New Period & Add Expense screens, numeric dashboard, category detail with expense history
 - [x] **Phase 2** — Charts (pie split, planned-vs-spent bars, spending-over-time line)
-- [ ] **Phase 3** — Recurring rules + auto-generated expenses
+- [x] **Phase 3** — Recurring rules: templates, pre-fill new periods, auto-generate expenses
 - [ ] **Phase 4** — PIN + biometric lock screen
 - [ ] **Phase 5** — Encrypted GitHub sync (push/pull `data.enc`)
 - [ ] **Phase 6** — History view, edge-case polish
