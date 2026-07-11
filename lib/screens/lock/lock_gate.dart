@@ -48,16 +48,26 @@ class _LockGateState extends State<LockGate> with WidgetsBindingObserver {
     });
   }
 
+  /// True once the app has been genuinely backgrounded (minimized/hidden), so
+  /// we don't re-lock on a mere focus change (alt-tab) on desktop.
+  bool _wasBackgrounded = false;
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_authInProgress) return;
-    if (state == AppLifecycleState.resumed) {
+
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      _wasBackgrounded = true;
+    } else if (state == AppLifecycleState.resumed) {
+      final wasBackgrounded = _wasBackgrounded;
+      _wasBackgrounded = false;
       // Re-check on resume: a PIN may have been set/cleared in Settings.
       _auth.hasPin().then((hasPin) {
         if (!mounted) return;
         setState(() {
           _hasPin = hasPin;
-          if (hasPin) _locked = true;
+          if (hasPin && wasBackgrounded) _locked = true;
         });
       });
     }

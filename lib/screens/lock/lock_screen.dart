@@ -29,7 +29,10 @@ class LockScreen extends StatefulWidget {
 class _LockScreenState extends State<LockScreen> {
   final _controller = TextEditingController();
   bool _error = false;
-  bool _biometricAvailable = false;
+
+  /// Only true when the user has actually turned biometric unlock ON in
+  /// Settings (and the device supports it). Never offer it otherwise.
+  bool _biometricOffered = false;
 
   @override
   void initState() {
@@ -45,10 +48,10 @@ class _LockScreenState extends State<LockScreen> {
 
   Future<void> _maybeStartBiometric() async {
     final enabled = await widget.auth.isBiometricEnabled();
-    final available = await widget.auth.canUseBiometrics();
+    final available = enabled && await widget.auth.canUseBiometrics();
     if (!mounted) return;
-    setState(() => _biometricAvailable = available);
-    if (enabled && available) _authenticateBiometric();
+    setState(() => _biometricOffered = available);
+    if (available) _authenticateBiometric();
   }
 
   Future<void> _authenticateBiometric() async {
@@ -116,7 +119,7 @@ class _LockScreenState extends State<LockScreen> {
                     child: Text(l10n.unlock),
                   ),
                 ),
-                if (_biometricAvailable) ...[
+                if (_biometricOffered) ...[
                   const SizedBox(height: 8),
                   TextButton.icon(
                     onPressed: _authenticateBiometric,
