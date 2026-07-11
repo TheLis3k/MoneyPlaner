@@ -298,4 +298,73 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get lockDisabled => 'Blokada aplikacji wyłączona';
+
+  @override
+  String get cloudSync => 'Synchronizacja w chmurze';
+
+  @override
+  String get syncSubtitle =>
+      'Zaszyfrowana kopia w prywatnym repozytorium GitHub';
+
+  @override
+  String get setUpSync => 'Skonfiguruj synchronizację GitHub';
+
+  @override
+  String get githubToken => 'Token GitHub';
+
+  @override
+  String get repoOwner => 'Właściciel (użytkownik lub organizacja)';
+
+  @override
+  String get repoName => 'Repozytorium';
+
+  @override
+  String get filePath => 'Ścieżka pliku';
+
+  @override
+  String get syncPassphrase => 'Hasło szyfrowania';
+
+  @override
+  String get connect => 'Połącz';
+
+  @override
+  String get syncNow => 'Synchronizuj teraz';
+
+  @override
+  String get restoreFromCloud => 'Przywróć z chmury';
+
+  @override
+  String get disconnect => 'Rozłącz';
+
+  @override
+  String lastSynced(String when) {
+    return 'Ostatnia synchronizacja: $when';
+  }
+
+  @override
+  String get neverSynced => 'Nigdy nie synchronizowano';
+
+  @override
+  String get syncComplete => 'Synchronizacja zakończona';
+
+  @override
+  String get restoreComplete => 'Przywrócono z chmury';
+
+  @override
+  String get nothingToRestore => 'Nie ma jeszcze czego przywracać';
+
+  @override
+  String get restoreWarningTitle => 'Przywrócić z chmury?';
+
+  @override
+  String get restoreWarningBody =>
+      'To zastąpi wszystkie lokalne dane kopią z chmury.';
+
+  @override
+  String syncFailed(String error) {
+    return 'Synchronizacja nie powiodła się: $error';
+  }
+
+  @override
+  String get restore => 'Przywróć';
 }

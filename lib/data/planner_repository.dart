@@ -197,6 +197,51 @@ class PlannerRepository {
     };
   }
 
+  // -------------------------------------------------------------- export/import
+
+  /// Tables in parent-first order (safe to insert in this order).
+  static const _exportTables = [
+    'periods',
+    'categories',
+    'recurring_rules',
+    'splits',
+    'expenses',
+  ];
+
+  /// Dumps the whole database to a plain map, ready to be JSON-encoded.
+  Future<Map<String, Object?>> exportData() async {
+    final db = await _db;
+    final data = <String, Object?>{};
+    for (final table in _exportTables) {
+      data[table] = await db.query(table);
+    }
+    return {
+      'version': 1,
+      'exportedAt': DateTime.now().toIso8601String(),
+      'data': data,
+    };
+  }
+
+  /// Replaces all local data with the contents of a previously exported map.
+  /// Runs in a transaction so a failure leaves the database untouched.
+  Future<void> importData(Map<String, Object?> export) async {
+    final data = (export['data'] as Map).cast<String, Object?>();
+    final db = await _db;
+    await db.transaction((txn) async {
+      // Delete child-first to satisfy foreign keys.
+      for (final table in _exportTables.reversed) {
+        await txn.delete(table);
+      }
+      // Insert parent-first.
+      for (final table in _exportTables) {
+        final rows = (data[table] as List?) ?? const [];
+        for (final row in rows) {
+          await txn.insert(table, (row as Map).cast<String, Object?>());
+        }
+      }
+    });
+  }
+
   // ----------------------------------------------------------------- aggregate
 
   /// Assembles the per-category planned/spent/remaining view for a period.

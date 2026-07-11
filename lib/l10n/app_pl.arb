@@ -99,5 +99,27 @@
   "useBiometrics": "Użyj biometrii",
   "biometricReason": "Uwierzytelnij, aby odblokować Money Planner",
   "pinSaved": "Zapisano PIN",
-  "lockDisabled": "Blokada aplikacji wyłączona"
+  "lockDisabled": "Blokada aplikacji wyłączona",
+
+  "cloudSync": "Synchronizacja w chmurze",
+  "syncSubtitle": "Zaszyfrowana kopia w prywatnym repozytorium GitHub",
+  "setUpSync": "Skonfiguruj synchronizację GitHub",
+  "githubToken": "Token GitHub",
+  "repoOwner": "Właściciel (użytkownik lub organizacja)",
+  "repoName": "Repozytorium",
+  "filePath": "Ścieżka pliku",
+  "syncPassphrase": "Hasło szyfrowania",
+  "connect": "Połącz",
+  "syncNow": "Synchronizuj teraz",
+  "restoreFromCloud": "Przywróć z chmury",
+  "disconnect": "Rozłącz",
+  "lastSynced": "Ostatnia synchronizacja: {when}",
+  "neverSynced": "Nigdy nie synchronizowano",
+  "syncComplete": "Synchronizacja zakończona",
+  "restoreComplete": "Przywrócono z chmury",
+  "nothingToRestore": "Nie ma jeszcze czego przywracać",
+  "restoreWarningTitle": "Przywrócić z chmury?",
+  "restoreWarningBody": "To zastąpi wszystkie lokalne dane kopią z chmury.",
+  "syncFailed": "Synchronizacja nie powiodła się: {error}",
+  "restore": "Przywróć"
 }

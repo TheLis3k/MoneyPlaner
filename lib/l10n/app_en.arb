@@ -117,5 +117,33 @@
   "useBiometrics": "Use biometrics",
   "biometricReason": "Authenticate to unlock Money Planner",
   "pinSaved": "PIN saved",
-  "lockDisabled": "App lock disabled"
+  "lockDisabled": "App lock disabled",
+
+  "cloudSync": "Cloud sync",
+  "syncSubtitle": "Encrypted backup to a private GitHub repo",
+  "setUpSync": "Set up GitHub sync",
+  "githubToken": "GitHub token",
+  "repoOwner": "Owner (user or org)",
+  "repoName": "Repository",
+  "filePath": "File path",
+  "syncPassphrase": "Encryption passphrase",
+  "connect": "Connect",
+  "syncNow": "Sync now",
+  "restoreFromCloud": "Restore from cloud",
+  "disconnect": "Disconnect",
+  "lastSynced": "Last synced: {when}",
+  "@lastSynced": {
+    "placeholders": { "when": { "type": "String" } }
+  },
+  "neverSynced": "Never synced",
+  "syncComplete": "Sync complete",
+  "restoreComplete": "Restored from cloud",
+  "nothingToRestore": "Nothing to restore yet",
+  "restoreWarningTitle": "Restore from cloud?",
+  "restoreWarningBody": "This replaces all local data with the cloud copy.",
+  "syncFailed": "Sync failed: {error}",
+  "@syncFailed": {
+    "placeholders": { "error": { "type": "String" } }
+  },
+  "restore": "Restore"
 }

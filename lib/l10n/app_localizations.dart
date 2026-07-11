@@ -631,6 +631,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'App lock disabled'**
   String get lockDisabled;
+
+  /// No description provided for @cloudSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync'**
+  String get cloudSync;
+
+  /// No description provided for @syncSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted backup to a private GitHub repo'**
+  String get syncSubtitle;
+
+  /// No description provided for @setUpSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up GitHub sync'**
+  String get setUpSync;
+
+  /// No description provided for @githubToken.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub token'**
+  String get githubToken;
+
+  /// No description provided for @repoOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner (user or org)'**
+  String get repoOwner;
+
+  /// No description provided for @repoName.
+  ///
+  /// In en, this message translates to:
+  /// **'Repository'**
+  String get repoName;
+
+  /// No description provided for @filePath.
+  ///
+  /// In en, this message translates to:
+  /// **'File path'**
+  String get filePath;
+
+  /// No description provided for @syncPassphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption passphrase'**
+  String get syncPassphrase;
+
+  /// No description provided for @connect.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get connect;
+
+  /// No description provided for @syncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync now'**
+  String get syncNow;
+
+  /// No description provided for @restoreFromCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from cloud'**
+  String get restoreFromCloud;
+
+  /// No description provided for @disconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get disconnect;
+
+  /// No description provided for @lastSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Last synced: {when}'**
+  String lastSynced(String when);
+
+  /// No description provided for @neverSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Never synced'**
+  String get neverSynced;
+
+  /// No description provided for @syncComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync complete'**
+  String get syncComplete;
+
+  /// No description provided for @restoreComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored from cloud'**
+  String get restoreComplete;
+
+  /// No description provided for @nothingToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to restore yet'**
+  String get nothingToRestore;
+
+  /// No description provided for @restoreWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from cloud?'**
+  String get restoreWarningTitle;
+
+  /// No description provided for @restoreWarningBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This replaces all local data with the cloud copy.'**
+  String get restoreWarningBody;
+
+  /// No description provided for @syncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed: {error}'**
+  String syncFailed(String error);
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
 }
 
 class _AppLocalizationsDelegate

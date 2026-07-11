@@ -297,4 +297,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lockDisabled => 'App lock disabled';
+
+  @override
+  String get cloudSync => 'Cloud sync';
+
+  @override
+  String get syncSubtitle => 'Encrypted backup to a private GitHub repo';
+
+  @override
+  String get setUpSync => 'Set up GitHub sync';
+
+  @override
+  String get githubToken => 'GitHub token';
+
+  @override
+  String get repoOwner => 'Owner (user or org)';
+
+  @override
+  String get repoName => 'Repository';
+
+  @override
+  String get filePath => 'File path';
+
+  @override
+  String get syncPassphrase => 'Encryption passphrase';
+
+  @override
+  String get connect => 'Connect';
+
+  @override
+  String get syncNow => 'Sync now';
+
+  @override
+  String get restoreFromCloud => 'Restore from cloud';
+
+  @override
+  String get disconnect => 'Disconnect';
+
+  @override
+  String lastSynced(String when) {
+    return 'Last synced: $when';
+  }
+
+  @override
+  String get neverSynced => 'Never synced';
+
+  @override
+  String get syncComplete => 'Sync complete';
+
+  @override
+  String get restoreComplete => 'Restored from cloud';
+
+  @override
+  String get nothingToRestore => 'Nothing to restore yet';
+
+  @override
+  String get restoreWarningTitle => 'Restore from cloud?';
+
+  @override
+  String get restoreWarningBody =>
+      'This replaces all local data with the cloud copy.';
+
+  @override
+  String syncFailed(String error) {
+    return 'Sync failed: $error';
+  }
+
+  @override
+  String get restore => 'Restore';
 }

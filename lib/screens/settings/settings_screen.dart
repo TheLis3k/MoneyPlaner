@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../services/auth_service.dart';
+import '../../services/sync_manager.dart';
+import '../../state/planner_state.dart';
+import 'sync_setup_screen.dart';
 
 /// Settings — currently the Security section: PIN lock and biometric unlock.
 class SettingsScreen extends StatefulWidget {
@@ -14,11 +19,15 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final AuthService _auth = AuthService();
+  final SyncManager _sync = SyncManager();
 
   bool _loading = true;
   bool _hasPin = false;
   bool _biometricAvailable = false;
   bool _biometricEnabled = false;
+
+  SyncSettings? _syncSettings;
+  bool _syncing = false;
 
   @override
   void initState() {
@@ -30,11 +39,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final hasPin = await _auth.hasPin();
     final available = await _auth.canUseBiometrics();
     final enabled = await _auth.isBiometricEnabled();
+    final syncSettings = await _sync.loadSettings();
     if (!mounted) return;
     setState(() {
       _hasPin = hasPin;
       _biometricAvailable = available;
       _biometricEnabled = enabled;
+      _syncSettings = syncSettings;
       _loading = false;
     });
   }
@@ -75,6 +86,78 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  // ---- cloud sync -----------------------------------------------------------
+
+  Future<void> _setUpSync() async {
+    final configured = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => SyncSetupScreen(sync: _sync)),
+    );
+    if (configured == true) await _load();
+  }
+
+  Future<void> _syncNow() async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _syncing = true);
+    try {
+      await _sync.push();
+      await _load();
+      messenger.showSnackBar(SnackBar(content: Text(l10n.syncComplete)));
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.syncFailed('$e'))));
+    } finally {
+      if (mounted) setState(() => _syncing = false);
+    }
+  }
+
+  Future<void> _restore() async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final planner = context.read<PlannerState>();
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.restoreWarningTitle),
+        content: Text(l10n.restoreWarningBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.restore),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    setState(() => _syncing = true);
+    try {
+      final restored = await _sync.pull();
+      if (restored) await planner.load();
+      await _load();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            restored ? l10n.restoreComplete : l10n.nothingToRestore,
+          ),
+        ),
+      );
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.syncFailed('$e'))));
+    } finally {
+      if (mounted) setState(() => _syncing = false);
+    }
+  }
+
+  Future<void> _disconnect() async {
+    await _sync.disconnect();
+    await _load();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -111,9 +194,82 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _biometricEnabled,
                     onChanged: _toggleBiometric,
                   ),
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                  child: Text(
+                    l10n.cloudSync,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ),
+                ..._buildSyncSection(l10n),
               ],
             ),
     );
+  }
+
+  List<Widget> _buildSyncSection(AppLocalizations l10n) {
+    final settings = _syncSettings;
+    if (settings == null) {
+      return [
+        ListTile(
+          leading: const Icon(Icons.cloud_upload_outlined),
+          title: Text(l10n.setUpSync),
+          subtitle: Text(l10n.syncSubtitle),
+          onTap: _setUpSync,
+        ),
+      ];
+    }
+
+    final lastSync = settings.lastSync == null
+        ? l10n.neverSynced
+        : l10n.lastSynced(
+            DateFormat.yMMMd('pl').add_Hm().format(settings.lastSync!),
+          );
+
+    return [
+      ListTile(
+        leading: const Icon(Icons.cloud_done_outlined),
+        title: Text(settings.repoLabel),
+        subtitle: Text('${settings.path} · $lastSync'),
+      ),
+      if (_syncing)
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8),
+          child: Center(child: CircularProgressIndicator()),
+        )
+      else
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: _syncNow,
+                  icon: const Icon(Icons.sync),
+                  label: Text(l10n.syncNow),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _restore,
+                  icon: const Icon(Icons.cloud_download_outlined),
+                  label: Text(l10n.restoreFromCloud),
+                ),
+              ),
+            ],
+          ),
+        ),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          onPressed: _disconnect,
+          icon: const Icon(Icons.link_off),
+          label: Text(l10n.disconnect),
+        ),
+      ),
+    ];
   }
 }
 
