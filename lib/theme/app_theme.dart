@@ -10,6 +10,7 @@ class AppTheme {
   static const _track = Color(0xFF27272A); // progress track, dividers
   static const _fg = Color(0xFFFAFAFA); // primary text / CTA
   static const _muted = Color(0xFFA1A1AA); // secondary text
+  static const _faint = Color(0xFF71717A); // inactive / labels
 
   static final ColorScheme _scheme = const ColorScheme.dark().copyWith(
     primary: _fg,
@@ -46,10 +47,29 @@ class AppTheme {
       colorScheme: _scheme,
       scaffoldBackgroundColor: _bg,
       useMaterial3: true,
+      fontFamily: 'Inter',
     );
 
+    // Inter with slightly tightened tracking on larger text — the shadcn feel.
+    final text = base.textTheme
+        .apply(bodyColor: _fg, displayColor: _fg)
+        .copyWith(
+          titleLarge: base.textTheme.titleLarge?.copyWith(
+            letterSpacing: -0.3,
+            fontWeight: FontWeight.w700,
+          ),
+          titleMedium: base.textTheme.titleMedium?.copyWith(
+            letterSpacing: -0.2,
+            fontWeight: FontWeight.w600,
+          ),
+          headlineSmall: base.textTheme.headlineSmall?.copyWith(
+            letterSpacing: -0.4,
+            fontWeight: FontWeight.w700,
+          ),
+        );
+
     return base.copyWith(
-      textTheme: base.textTheme.apply(bodyColor: _fg, displayColor: _fg),
+      textTheme: text,
       appBarTheme: const AppBarTheme(
         backgroundColor: _bg,
         foregroundColor: _fg,
@@ -83,10 +103,51 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: _bg,
-        indicatorColor: _track,
+        indicatorColor: Colors.transparent,
         elevation: 0,
-        labelTextStyle: WidgetStateProperty.all(
-          const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            size: 22,
+            color: states.contains(WidgetState.selected) ? _fg : _faint,
+          ),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: states.contains(WidgetState.selected) ? _fg : _faint,
+          ),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: _card,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: _border),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: _card,
+        surfaceTintColor: Colors.transparent,
+        showDragHandle: true,
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: _card,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: _border),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: _fg,
+          side: const BorderSide(color: _track),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
       listTileTheme: const ListTileThemeData(iconColor: _muted),
