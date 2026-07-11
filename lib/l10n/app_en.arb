@@ -98,5 +98,24 @@
   "@recurringApplied": {
     "placeholders": { "count": { "type": "int" } }
   },
-  "needCategoryFirst": "Add a category first."
+  "needCategoryFirst": "Add a category first.",
+
+  "settings": "Settings",
+  "security": "Security",
+  "appLock": "App lock (PIN)",
+  "appLockSubtitle": "Require a PIN to open the app",
+  "changePin": "Change PIN",
+  "biometricUnlock": "Unlock with biometrics",
+  "setPin": "Set PIN",
+  "enterPin": "Enter PIN",
+  "confirmPin": "Confirm PIN",
+  "pinTooShort": "PIN must be at least 6 digits",
+  "pinsDontMatch": "PINs don't match",
+  "wrongPin": "Incorrect PIN",
+  "unlock": "Unlock",
+  "unlockTitle": "Enter your PIN",
+  "useBiometrics": "Use biometrics",
+  "biometricReason": "Authenticate to unlock Money Planner",
+  "pinSaved": "PIN saved",
+  "lockDisabled": "App lock disabled"
 }

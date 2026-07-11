@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'l10n/app_localizations.dart';
 import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/lock/lock_gate.dart';
 import 'state/planner_state.dart';
 import 'theme/app_theme.dart';
 
@@ -24,7 +25,7 @@ class MoneyPlannerApp extends StatelessWidget {
         locale: const Locale('pl'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const DashboardScreen(),
+        home: const LockGate(child: DashboardScreen()),
       ),
     );
   }

@@ -243,4 +243,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get needCategoryFirst => 'Add a category first.';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get security => 'Security';
+
+  @override
+  String get appLock => 'App lock (PIN)';
+
+  @override
+  String get appLockSubtitle => 'Require a PIN to open the app';
+
+  @override
+  String get changePin => 'Change PIN';
+
+  @override
+  String get biometricUnlock => 'Unlock with biometrics';
+
+  @override
+  String get setPin => 'Set PIN';
+
+  @override
+  String get enterPin => 'Enter PIN';
+
+  @override
+  String get confirmPin => 'Confirm PIN';
+
+  @override
+  String get pinTooShort => 'PIN must be at least 6 digits';
+
+  @override
+  String get pinsDontMatch => 'PINs don\'t match';
+
+  @override
+  String get wrongPin => 'Incorrect PIN';
+
+  @override
+  String get unlock => 'Unlock';
+
+  @override
+  String get unlockTitle => 'Enter your PIN';
+
+  @override
+  String get useBiometrics => 'Use biometrics';
+
+  @override
+  String get biometricReason => 'Authenticate to unlock Money Planner';
+
+  @override
+  String get pinSaved => 'PIN saved';
+
+  @override
+  String get lockDisabled => 'App lock disabled';
 }

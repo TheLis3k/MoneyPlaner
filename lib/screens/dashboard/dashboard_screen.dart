@@ -13,6 +13,7 @@ import '../categories/categories_screen.dart';
 import '../category_detail/category_detail_screen.dart';
 import '../period_setup/new_period_screen.dart';
 import '../recurring/recurring_rules_screen.dart';
+import '../settings/settings_screen.dart';
 import 'widgets/planned_pie_chart.dart';
 import 'widgets/planned_vs_spent_chart.dart';
 
@@ -45,6 +46,13 @@ class DashboardScreen extends StatelessWidget {
             onPressed: () => Navigator.of(
               context,
             ).push(MaterialPageRoute(builder: (_) => const CategoriesScreen())),
+          ),
+          IconButton(
+            tooltip: l10n.settings,
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
           ),
         ],
       ),

@@ -244,4 +244,58 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get needCategoryFirst => 'Najpierw dodaj kategorię.';
+
+  @override
+  String get settings => 'Ustawienia';
+
+  @override
+  String get security => 'Bezpieczeństwo';
+
+  @override
+  String get appLock => 'Blokada aplikacji (PIN)';
+
+  @override
+  String get appLockSubtitle => 'Wymagaj PIN-u do otwarcia aplikacji';
+
+  @override
+  String get changePin => 'Zmień PIN';
+
+  @override
+  String get biometricUnlock => 'Odblokuj biometrią';
+
+  @override
+  String get setPin => 'Ustaw PIN';
+
+  @override
+  String get enterPin => 'Wprowadź PIN';
+
+  @override
+  String get confirmPin => 'Potwierdź PIN';
+
+  @override
+  String get pinTooShort => 'PIN musi mieć co najmniej 6 cyfr';
+
+  @override
+  String get pinsDontMatch => 'PIN-y nie są zgodne';
+
+  @override
+  String get wrongPin => 'Nieprawidłowy PIN';
+
+  @override
+  String get unlock => 'Odblokuj';
+
+  @override
+  String get unlockTitle => 'Wprowadź swój PIN';
+
+  @override
+  String get useBiometrics => 'Użyj biometrii';
+
+  @override
+  String get biometricReason => 'Uwierzytelnij, aby odblokować Money Planner';
+
+  @override
+  String get pinSaved => 'Zapisano PIN';
+
+  @override
+  String get lockDisabled => 'Blokada aplikacji wyłączona';
 }
