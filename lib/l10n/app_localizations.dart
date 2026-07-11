@@ -788,6 +788,24 @@ abstract class AppLocalizations {
   /// **'No periods yet.'**
   String get noPeriodsYet;
 
+  /// No description provided for @deletePeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete period'**
+  String get deletePeriod;
+
+  /// No description provided for @deletePeriodConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\" and all its data?'**
+  String deletePeriodConfirm(String name);
+
+  /// No description provided for @periodDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Period deleted'**
+  String get periodDeleted;
+
   /// No description provided for @dashboard.
   ///
   /// In en, this message translates to:

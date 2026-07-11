@@ -8,7 +8,6 @@ import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
 import '../add_expense/add_expense_screen.dart';
-import '../categories/categories_screen.dart';
 import '../category_detail/category_detail_screen.dart';
 import '../history/history_screen.dart';
 import '../period_setup/new_period_screen.dart';
@@ -115,8 +114,7 @@ class _BottomNav extends StatelessWidget {
         onDestinationSelected: (i) {
           Widget? screen = switch (i) {
             1 => const HistoryScreen(),
-            2 => const CategoriesScreen(),
-            3 => const SettingsScreen(),
+            2 => const SettingsScreen(),
             _ => null,
           };
           if (screen != null) {
@@ -134,10 +132,6 @@ class _BottomNav extends StatelessWidget {
           NavigationDestination(
             icon: const Icon(Icons.history),
             label: l10n.history,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.grid_view_outlined),
-            label: l10n.categories,
           ),
           NavigationDestination(
             icon: const Icon(Icons.settings_outlined),

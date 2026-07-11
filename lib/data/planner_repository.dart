@@ -87,6 +87,21 @@ class PlannerRepository {
     );
   }
 
+  /// Deletes a period along with its splits and their expenses, in a
+  /// transaction (child-first so foreign keys stay satisfied).
+  Future<void> deletePeriod(int periodId) async {
+    final db = await _db;
+    await db.transaction((txn) async {
+      await txn.rawDelete(
+        'DELETE FROM expenses WHERE split_id IN '
+        '(SELECT id FROM splits WHERE period_id = ?)',
+        [periodId],
+      );
+      await txn.delete('splits', where: 'period_id = ?', whereArgs: [periodId]);
+      await txn.delete('periods', where: 'id = ?', whereArgs: [periodId]);
+    });
+  }
+
   // -------------------------------------------------------------------- splits
 
   Future<List<Split>> getSplitsForPeriod(int periodId) async {

@@ -128,6 +128,9 @@
 
   "history": "Historia",
   "noPeriodsYet": "Brak okresów.",
+  "deletePeriod": "Usuń okres",
+  "deletePeriodConfirm": "Usunąć „{name}” i wszystkie jego dane?",
+  "periodDeleted": "Okres usunięty",
   "dashboard": "Pulpit",
   "periodRange": "{start} – {end}"
 }

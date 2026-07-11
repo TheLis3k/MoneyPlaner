@@ -175,6 +175,18 @@ class PlannerState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Deletes a period and all its data. If it was the current one, falls back
+  /// to the most recent remaining period.
+  Future<void> deletePeriod(int periodId) async {
+    await _repo.deletePeriod(periodId);
+    _periods = await _repo.getPeriods();
+    if (_currentPeriod?.id == periodId) {
+      _currentPeriod = _periods.isNotEmpty ? _periods.first : null;
+    }
+    await _refreshProgress();
+    notifyListeners();
+  }
+
   Future<void> addExpense({
     required int splitId,
     required double amount,

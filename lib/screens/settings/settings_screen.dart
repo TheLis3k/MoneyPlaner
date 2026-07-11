@@ -7,6 +7,7 @@ import '../../l10n/app_localizations.dart';
 import '../../services/auth_service.dart';
 import '../../services/sync_manager.dart';
 import '../../state/planner_state.dart';
+import '../categories/categories_screen.dart';
 import 'sync_setup_screen.dart';
 
 /// Settings — currently the Security section: PIN lock and biometric unlock.
@@ -167,6 +168,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
+                ListTile(
+                  leading: const Icon(Icons.grid_view_outlined),
+                  title: Text(l10n.manageCategories),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+                  ),
+                ),
+                const Divider(),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
                   child: Text(

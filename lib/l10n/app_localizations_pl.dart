@@ -384,6 +384,17 @@ class AppLocalizationsPl extends AppLocalizations {
   String get noPeriodsYet => 'Brak okresów.';
 
   @override
+  String get deletePeriod => 'Usuń okres';
+
+  @override
+  String deletePeriodConfirm(String name) {
+    return 'Usunąć „$name” i wszystkie jego dane?';
+  }
+
+  @override
+  String get periodDeleted => 'Okres usunięty';
+
+  @override
   String get dashboard => 'Pulpit';
 
   @override

@@ -152,6 +152,12 @@
 
   "history": "History",
   "noPeriodsYet": "No periods yet.",
+  "deletePeriod": "Delete period",
+  "deletePeriodConfirm": "Delete \"{name}\" and all its data?",
+  "@deletePeriodConfirm": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "periodDeleted": "Period deleted",
   "dashboard": "Dashboard",
   "periodRange": "{start} – {end}",
   "@periodRange": {

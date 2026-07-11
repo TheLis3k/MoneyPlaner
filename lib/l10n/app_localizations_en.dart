@@ -382,6 +382,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPeriodsYet => 'No periods yet.';
 
   @override
+  String get deletePeriod => 'Delete period';
+
+  @override
+  String deletePeriodConfirm(String name) {
+    return 'Delete \"$name\" and all its data?';
+  }
+
+  @override
+  String get periodDeleted => 'Period deleted';
+
+  @override
   String get dashboard => 'Dashboard';
 
   @override
