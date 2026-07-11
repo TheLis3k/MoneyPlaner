@@ -134,7 +134,7 @@ flutter test
 - [x] **Phase 1** — New Period & Add Expense screens, numeric dashboard, category detail with expense history
 - [x] **Phase 2** — Charts (pie split, planned-vs-spent bars, spending-over-time line)
 - [x] **Phase 3** — Recurring rules: templates, pre-fill new periods, auto-generate expenses
-- [ ] **Phase 4** — PIN + biometric lock screen
+- [x] **Phase 4** — PIN (salted PBKDF2) + biometric lock screen, Settings security section
 - [ ] **Phase 5** — Encrypted GitHub sync (push/pull `data.enc`)
 - [ ] **Phase 6** — History view, edge-case polish
 
