@@ -3,17 +3,23 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../../models/period_summary.dart';
+import '../../models/transaction.dart';
 import '../../state/planner_state.dart';
+import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
-import '../period_setup/new_period_screen.dart';
+import '../add_expense/add_expense_screen.dart';
 
-const _accent = Color(0xFF22C55E);
-
-/// Sets: every planning period grouped into upcoming / current / earlier, with
-/// the active set highlighted. Create and delete sets from here.
-class HistoryScreen extends StatelessWidget {
+/// History (Historia): the current period's transactions grouped by day, with
+/// a category filter.
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  int? _categoryId; // null = all
 
   @override
   Widget build(BuildContext context) {
@@ -22,27 +28,38 @@ class HistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.history)),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => const NewPeriodScreen())),
-        icon: const Icon(Icons.add),
-        label: Text(l10n.newPeriod),
-      ),
-      body: FutureBuilder<List<PeriodSummary>>(
-        key: ValueKey(state.periods.length),
-        future: state.periodSummaries(),
+      body: FutureBuilder<List<Transaction>>(
+        key: ValueKey(state.totalSpent),
+        future: state.currentPeriodTransactions(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
-          final summaries = snapshot.data!;
-          if (summaries.isEmpty) {
-            return Center(child: Text(l10n.noPeriodsYet));
+          final all = snapshot.data!;
+          if (all.isEmpty) {
+            return Center(child: Text(l10n.noExpenses));
           }
-          return _Grouped(
-            summaries: summaries,
-            activeId: state.currentPeriod?.id,
+
+          // Distinct categories for the filter row (first-seen order).
+          final categories = <int, String>{};
+          for (final t in all) {
+            categories.putIfAbsent(t.category.id!, () => t.category.name);
+          }
+
+          final visible = _categoryId == null
+              ? all
+              : all.where((t) => t.category.id == _categoryId).toList();
+
+          return Column(
+            children: [
+              _FilterBar(
+                categories: categories,
+                selected: _categoryId,
+                onSelect: (id) => setState(() => _categoryId = id),
+              ),
+              const Divider(height: 1),
+              Expanded(child: _DayGroups(transactions: visible)),
+            ],
           );
         },
       ),
@@ -50,204 +67,196 @@ class HistoryScreen extends StatelessWidget {
   }
 }
 
-class _Grouped extends StatelessWidget {
-  const _Grouped({required this.summaries, required this.activeId});
+class _FilterBar extends StatelessWidget {
+  const _FilterBar({
+    required this.categories,
+    required this.selected,
+    required this.onSelect,
+  });
 
-  final List<PeriodSummary> summaries;
-  final int? activeId;
+  final Map<int, String> categories;
+  final int? selected;
+  final ValueChanged<int?> onSelect;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final now = DateTime.now();
-    final todayStart = DateTime(now.year, now.month, now.day);
-    final todayEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-    final upcoming = <PeriodSummary>[];
-    final current = <PeriodSummary>[];
-    final earlier = <PeriodSummary>[];
-    for (final s in summaries) {
-      if (s.period.endDate.isBefore(todayStart)) {
-        earlier.add(s);
-      } else if (s.period.startDate.isAfter(todayEnd)) {
-        upcoming.add(s);
-      } else {
-        current.add(s);
-      }
-    }
-    // Soonest upcoming first; earlier stays newest-first (already DESC).
-    upcoming.sort((a, b) => a.period.startDate.compareTo(b.period.startDate));
-
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
-      children: [
-        if (upcoming.isNotEmpty) ..._section(context, l10n.upcoming, upcoming),
-        if (current.isNotEmpty) ..._section(context, l10n.currentSet, current),
-        if (earlier.isNotEmpty) ..._section(context, l10n.earlier, earlier),
-      ],
-    );
-  }
-
-  List<Widget> _section(
-    BuildContext context,
-    String title,
-    List<PeriodSummary> items,
-  ) {
-    return [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(4, 16, 4, 8),
-        child: Text(
-          title.toUpperCase(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.6,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+    return SizedBox(
+      height: 52,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        children: [
+          _Chip(
+            label: l10n.all,
+            selected: selected == null,
+            onTap: () => onSelect(null),
           ),
-        ),
+          for (final entry in categories.entries)
+            _Chip(
+              label: entry.value,
+              selected: selected == entry.key,
+              onTap: () => onSelect(entry.key),
+            ),
+        ],
       ),
-      for (final s in items) ...[
-        _PeriodTile(summary: s, active: s.period.id == activeId),
-        const SizedBox(height: 10),
-      ],
-    ];
+    );
   }
 }
 
-class _PeriodTile extends StatelessWidget {
-  const _PeriodTile({required this.summary, required this.active});
+class _Chip extends StatelessWidget {
+  const _Chip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
-  final PeriodSummary summary;
-  final bool active;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? scheme.primary : scheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: selected ? scheme.primary : scheme.surfaceContainerHigh,
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: selected ? scheme.onPrimary : scheme.onSurface,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DayGroups extends StatelessWidget {
+  const _DayGroups({required this.transactions});
+  final List<Transaction> transactions;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final dateFmt = DateFormat.yMMMd('pl');
-    final over = summary.spent > summary.planned;
-    final fraction = summary.income <= 0
-        ? 0.0
-        : (summary.spent / summary.income).clamp(0.0, 1.0);
 
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-        side: BorderSide(
-          color: active
-              ? _accent.withValues(alpha: 0.6)
-              : scheme.surfaceContainerHigh,
-          width: active ? 1.5 : 1,
-        ),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: () async {
-          await context.read<PlannerState>().selectPeriod(summary.period.id!);
-          if (context.mounted) Navigator.of(context).pop();
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          summary.period.name,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          '${dateFmt.format(summary.period.startDate)} – '
-                          '${dateFmt.format(summary.period.endDate)}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        formatZloty(summary.spent),
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: over ? scheme.error : scheme.onSurface,
-                        ),
-                      ),
-                      Text(
-                        '/ ${formatZloty(summary.income)}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: scheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    tooltip: l10n.deletePeriod,
-                    onPressed: () => _confirmDelete(context),
-                  ),
-                ],
+    // Group by calendar day, preserving newest-first order.
+    final groups = <DateTime, List<Transaction>>{};
+    for (final t in transactions) {
+      final day = DateTime(t.date.year, t.date.month, t.date.day);
+      groups.putIfAbsent(day, () => []).add(t);
+    }
+    final days = groups.keys.toList()..sort((a, b) => b.compareTo(a));
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    String label(DateTime day) {
+      final md = DateFormat.MMMMd('pl').format(day);
+      if (day == today) return '${l10n.today} · $md';
+      if (day == yesterday) return '${l10n.yesterday} · $md';
+      return md;
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      children: [
+        for (final day in days) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
+            child: Text(
+              label(day).toUpperCase(),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.6,
+                color: scheme.onSurfaceVariant,
               ),
-              if (active) ...[
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: LinearProgressIndicator(
-                    value: fraction,
-                    minHeight: 5,
-                    backgroundColor: scheme.surfaceContainerHighest,
-                    color: over ? scheme.error : _accent,
-                  ),
-                ),
-              ],
-            ],
+            ),
           ),
-        ),
-      ),
+          Card(
+            child: Column(
+              children: [
+                for (var i = 0; i < groups[day]!.length; i++) ...[
+                  _TransactionTile(transaction: groups[day]![i]),
+                  if (i < groups[day]!.length - 1) const Divider(height: 1),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ],
     );
   }
+}
 
-  Future<void> _confirmDelete(BuildContext context) async {
-    final l10n = AppLocalizations.of(context);
-    final state = context.read<PlannerState>();
-    final messenger = ScaffoldMessenger.of(context);
+class _TransactionTile extends StatelessWidget {
+  const _TransactionTile({required this.transaction});
+  final Transaction transaction;
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.deletePeriod),
-        content: Text(l10n.deletePeriodConfirm(summary.period.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.cancel),
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final color = transaction.category.displayColor;
+    final timeFmt = DateFormat.Hm('pl');
+
+    return ListTile(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => AddExpenseScreen(existing: transaction.toExpense()),
+        ),
+      ),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.16),
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Icon(transaction.category.displayIcon, color: color, size: 20),
+      ),
+      title: Text(
+        transaction.category.name,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: transaction.note == null || transaction.note!.isEmpty
+          ? null
+          : Text(
+              transaction.note!,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+      trailing: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            '−${formatZloty(transaction.amount)}',
+            style: const TextStyle(fontWeight: FontWeight.w700),
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.delete),
+          Text(
+            timeFmt.format(transaction.date),
+            style: TextStyle(fontSize: 11, color: scheme.onSurfaceVariant),
           ),
         ],
       ),
     );
-
-    if (confirmed == true) {
-      await state.deletePeriod(summary.period.id!);
-      messenger.showSnackBar(SnackBar(content: Text(l10n.periodDeleted)));
-    }
   }
 }

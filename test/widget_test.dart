@@ -26,7 +26,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Money Planner'), findsOneWidget);
+    expect(find.text('PLNing'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 }

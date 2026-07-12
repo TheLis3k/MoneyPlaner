@@ -113,13 +113,13 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardEmptyBody.
   ///
   /// In en, this message translates to:
-  /// **'Create a set and split your income to get started.'**
+  /// **'Create a period and split your income to get started.'**
   String get dashboardEmptyBody;
 
   /// No description provided for @newPeriod.
   ///
   /// In en, this message translates to:
-  /// **'New set'**
+  /// **'New period'**
   String get newPeriod;
 
   /// No description provided for @addExpense.
@@ -197,7 +197,7 @@ abstract class AppLocalizations {
   /// No description provided for @periodName.
   ///
   /// In en, this message translates to:
-  /// **'Set name'**
+  /// **'Period name'**
   String get periodName;
 
   /// No description provided for @enterName.
@@ -221,7 +221,7 @@ abstract class AppLocalizations {
   /// No description provided for @incomeForPeriod.
   ///
   /// In en, this message translates to:
-  /// **'Income for this set'**
+  /// **'Income for this period'**
   String get incomeForPeriod;
 
   /// No description provided for @enterIncome.
@@ -245,7 +245,7 @@ abstract class AppLocalizations {
   /// No description provided for @createPeriod.
   ///
   /// In en, this message translates to:
-  /// **'Create set'**
+  /// **'Create period'**
   String get createPeriod;
 
   /// No description provided for @editPlan.
@@ -263,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @noEnvelopesForExpense.
   ///
   /// In en, this message translates to:
-  /// **'This set has no envelopes yet. Add categories to the set before logging expenses.'**
+  /// **'This period has no envelopes yet. Add categories to the period before logging expenses.'**
   String get noEnvelopesForExpense;
 
   /// No description provided for @envelope.
@@ -383,13 +383,13 @@ abstract class AppLocalizations {
   /// No description provided for @categoryInUse.
   ///
   /// In en, this message translates to:
-  /// **'Can\'t delete a category that\'s used in a set.'**
+  /// **'Can\'t delete a category that\'s used in a period.'**
   String get categoryInUse;
 
   /// No description provided for @period.
   ///
   /// In en, this message translates to:
-  /// **'Set'**
+  /// **'Period'**
   String get period;
 
   /// No description provided for @expenses.
@@ -527,7 +527,7 @@ abstract class AppLocalizations {
   /// No description provided for @applyRecurring.
   ///
   /// In en, this message translates to:
-  /// **'Add recurring to this set'**
+  /// **'Add recurring to this period'**
   String get applyRecurring;
 
   /// No description provided for @recurringApplied.
@@ -899,13 +899,31 @@ abstract class AppLocalizations {
   /// No description provided for @history.
   ///
   /// In en, this message translates to:
-  /// **'Sets'**
+  /// **'History'**
   String get history;
+
+  /// No description provided for @periods.
+  ///
+  /// In en, this message translates to:
+  /// **'Periods'**
+  String get periods;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
 
   /// No description provided for @noPeriodsYet.
   ///
   /// In en, this message translates to:
-  /// **'No sets yet.'**
+  /// **'No periods yet.'**
   String get noPeriodsYet;
 
   /// No description provided for @upcoming.
@@ -935,7 +953,7 @@ abstract class AppLocalizations {
   /// No description provided for @deletePeriod.
   ///
   /// In en, this message translates to:
-  /// **'Delete set'**
+  /// **'Delete period'**
   String get deletePeriod;
 
   /// No description provided for @deletePeriodConfirm.
@@ -947,7 +965,7 @@ abstract class AppLocalizations {
   /// No description provided for @periodDeleted.
   ///
   /// In en, this message translates to:
-  /// **'Set deleted'**
+  /// **'Period deleted'**
   String get periodDeleted;
 
   /// No description provided for @dashboard.

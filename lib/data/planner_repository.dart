@@ -223,6 +223,26 @@ class PlannerRepository {
     await db.delete('expenses', where: 'id = ?', whereArgs: [expenseId]);
   }
 
+  /// All expenses in a period joined with their category, newest first — for
+  /// the transaction history screen.
+  Future<List<Map<String, Object?>>> periodTransactions(int periodId) async {
+    final db = await _db;
+    return db.rawQuery(
+      '''
+      SELECT e.id AS id, e.amount AS amount, e.date AS date, e.note AS note,
+             e.split_id AS split_id, e.recurring_id AS recurring_id,
+             c.id AS category_id, c.name AS category, c.color AS color,
+             c.icon AS icon
+      FROM expenses e
+      JOIN splits s ON s.id = e.split_id
+      JOIN categories c ON c.id = s.category_id
+      WHERE s.period_id = ?
+      ORDER BY e.date DESC, e.id DESC
+    ''',
+      [periodId],
+    );
+  }
+
   /// Total spent per split id across a whole period, in one grouped query.
   Future<Map<int, double>> spentBySplit(int periodId) async {
     final db = await _db;

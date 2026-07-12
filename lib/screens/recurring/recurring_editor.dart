@@ -35,7 +35,6 @@ class _RecurringEditorSheetState extends State<_RecurringEditorSheet> {
   late final TextEditingController _amountController;
   late final TextEditingController _noteController;
   late int _categoryId;
-  late RecurrenceFrequency _frequency;
   late bool _active;
 
   @override
@@ -47,7 +46,6 @@ class _RecurringEditorSheetState extends State<_RecurringEditorSheet> {
     );
     _noteController = TextEditingController(text: e?.note ?? '');
     _categoryId = e?.categoryId ?? widget.categories.first.id!;
-    _frequency = e?.frequency ?? RecurrenceFrequency.monthly;
     _active = e?.active ?? true;
   }
 
@@ -68,7 +66,7 @@ class _RecurringEditorSheetState extends State<_RecurringEditorSheet> {
         id: widget.existing?.id,
         categoryId: _categoryId,
         amount: amount,
-        frequency: _frequency,
+        frequency: widget.existing?.frequency ?? RecurrenceFrequency.monthly,
         note: _noteController.text.trim().isEmpty
             ? null
             : _noteController.text.trim(),
@@ -127,21 +125,6 @@ class _RecurringEditorSheetState extends State<_RecurringEditorSheet> {
                 suffixText: 'zł',
                 border: const OutlineInputBorder(),
               ),
-            ),
-            const SizedBox(height: 12),
-            SegmentedButton<RecurrenceFrequency>(
-              segments: [
-                ButtonSegment(
-                  value: RecurrenceFrequency.monthly,
-                  label: Text(l10n.monthly),
-                ),
-                ButtonSegment(
-                  value: RecurrenceFrequency.weekly,
-                  label: Text(l10n.weekly),
-                ),
-              ],
-              selected: {_frequency},
-              onSelectionChanged: (s) => setState(() => _frequency = s.first),
             ),
             const SizedBox(height: 12),
             TextField(

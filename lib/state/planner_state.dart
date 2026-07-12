@@ -234,6 +234,14 @@ class PlannerState extends ChangeNotifier {
 
   Future<List<PeriodSummary>> periodSummaries() => _repo.periodSummaries();
 
+  /// Transactions (expenses + category) for the current period, newest first.
+  Future<List<Transaction>> currentPeriodTransactions() async {
+    final id = _currentPeriod?.id;
+    if (id == null) return const [];
+    final rows = await _repo.periodTransactions(id);
+    return rows.map(Transaction.fromMap).toList();
+  }
+
   Future<List<CategoryProgress>> progressForPeriod(int periodId) =>
       _repo.categoryProgress(periodId);
 

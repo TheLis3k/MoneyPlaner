@@ -7,3 +7,4 @@ export 'period.dart';
 export 'split.dart';
 export 'expense.dart';
 export 'recurring_rule.dart';
+export 'transaction.dart';

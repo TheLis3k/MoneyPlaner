@@ -93,24 +93,25 @@ class _RuleTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final state = context.read<PlannerState>();
     final color = category?.displayColor ?? Theme.of(context).disabledColor;
-    final freq = rule.frequency == RecurrenceFrequency.monthly
-        ? l10n.monthly
-        : l10n.weekly;
 
     return Opacity(
       opacity: rule.active ? 1 : 0.5,
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withValues(alpha: 0.2),
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.16),
+            borderRadius: BorderRadius.circular(11),
+          ),
           child: Icon(category?.displayIcon ?? Icons.repeat, color: color),
         ),
         title: Text(
           rule.note?.isNotEmpty == true ? rule.note! : category?.name ?? '—',
         ),
-        subtitle: Text('${category?.name ?? ''} · $freq'),
+        subtitle: Text(category?.name ?? ''),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

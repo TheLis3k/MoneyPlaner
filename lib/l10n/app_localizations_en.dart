@@ -16,10 +16,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboardEmptyBody =>
-      'Create a set and split your income to get started.';
+      'Create a period and split your income to get started.';
 
   @override
-  String get newPeriod => 'New set';
+  String get newPeriod => 'New period';
 
   @override
   String get addExpense => 'Add expense';
@@ -64,7 +64,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get periodName => 'Set name';
+  String get periodName => 'Period name';
 
   @override
   String get enterName => 'Enter a name';
@@ -76,7 +76,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get end => 'End';
 
   @override
-  String get incomeForPeriod => 'Income for this set';
+  String get incomeForPeriod => 'Income for this period';
 
   @override
   String get enterIncome => 'Enter your income';
@@ -90,7 +90,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get createPeriod => 'Create set';
+  String get createPeriod => 'Create period';
 
   @override
   String get editPlan => 'Edit plan';
@@ -100,7 +100,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noEnvelopesForExpense =>
-      'This set has no envelopes yet. Add categories to the set before logging expenses.';
+      'This period has no envelopes yet. Add categories to the period before logging expenses.';
 
   @override
   String get envelope => 'Envelope';
@@ -160,10 +160,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noCategories => 'No categories yet. Add your first one.';
 
   @override
-  String get categoryInUse => 'Can\'t delete a category that\'s used in a set.';
+  String get categoryInUse =>
+      'Can\'t delete a category that\'s used in a period.';
 
   @override
-  String get period => 'Set';
+  String get period => 'Period';
 
   @override
   String get expenses => 'Expenses';
@@ -235,7 +236,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prefillFromRecurring => 'Pre-fill from recurring';
 
   @override
-  String get applyRecurring => 'Add recurring to this set';
+  String get applyRecurring => 'Add recurring to this period';
 
   @override
   String recurringApplied(int count) {
@@ -448,10 +449,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get history => 'Sets';
+  String get history => 'History';
 
   @override
-  String get noPeriodsYet => 'No sets yet.';
+  String get periods => 'Periods';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get noPeriodsYet => 'No periods yet.';
 
   @override
   String get upcoming => 'Upcoming';
@@ -466,7 +476,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newExpense => 'New expense';
 
   @override
-  String get deletePeriod => 'Delete set';
+  String get deletePeriod => 'Delete period';
 
   @override
   String deletePeriodConfirm(String name) {
@@ -474,7 +484,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get periodDeleted => 'Set deleted';
+  String get periodDeleted => 'Period deleted';
 
   @override
   String get dashboard => 'Dashboard';
