@@ -344,9 +344,9 @@ class _CategoryGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.count(
       crossAxisCount: 4,
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 0.82,
+      mainAxisSpacing: 6,
+      crossAxisSpacing: 8,
+      childAspectRatio: 0.92,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [

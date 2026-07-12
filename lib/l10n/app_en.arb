@@ -144,6 +144,25 @@
   "nothingToRestore": "Nothing to restore yet",
   "restoreWarningTitle": "Restore from cloud?",
   "restoreWarningBody": "This replaces all local data with the cloud copy.",
+  "restorePreviewCloud": "Cloud backup: {periods} periods · {expenses} expenses",
+  "@restorePreviewCloud": {
+    "placeholders": {
+      "periods": { "type": "int" },
+      "expenses": { "type": "int" }
+    }
+  },
+  "restorePreviewLocal": "Your data now: {periods} periods · {expenses} expenses — this will be replaced",
+  "@restorePreviewLocal": {
+    "placeholders": {
+      "periods": { "type": "int" },
+      "expenses": { "type": "int" }
+    }
+  },
+  "restoreSnapshotNote": "A safety copy of your current data is saved first, so you can recover if the restore is wrong.",
+  "snapshotKept": "Previous data saved to {path}",
+  "@snapshotKept": {
+    "placeholders": { "path": { "type": "String" } }
+  },
   "syncFailed": "Sync failed: {error}",
   "@syncFailed": {
     "placeholders": { "error": { "type": "String" } }
@@ -183,6 +202,8 @@
   "history": "History",
   "periods": "Periods",
   "all": "All",
+  "dateRange": "Date range",
+  "noMatchingExpenses": "No expenses match the filters.",
   "yesterday": "Yesterday",
   "noPeriodsYet": "No periods yet.",
   "upcoming": "Upcoming",

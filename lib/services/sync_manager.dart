@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 import '../data/planner_repository.dart';
 import 'crypto_service.dart';
@@ -21,6 +24,27 @@ class SyncSettings {
   });
 
   String get repoLabel => '$owner/$repo';
+}
+
+/// A decrypted, parsed cloud backup ready to apply, paired with row counts for
+/// both the remote copy and the current local data so the user can review the
+/// destructive replace before confirming.
+class RestorePreview {
+  final Map<String, Object?> export;
+  final int remotePeriods;
+  final int remoteExpenses;
+  final int localPeriods;
+  final int localExpenses;
+  final DateTime? exportedAt;
+
+  const RestorePreview({
+    required this.export,
+    required this.remotePeriods,
+    required this.remoteExpenses,
+    required this.localPeriods,
+    required this.localExpenses,
+    this.exportedAt,
+  });
 }
 
 /// Orchestrates encrypted sync: export → encrypt → push, and pull → decrypt →
@@ -115,22 +139,69 @@ class SyncManager {
     await _stampLastSync();
   }
 
-  /// Pulls the remote blob, decrypts it, and replaces local data with it.
-  /// Returns false if there's nothing on the remote yet.
-  Future<bool> pull() async {
+  /// Fetches the remote blob and decrypts it *without* touching local data,
+  /// returning a preview (remote vs. local row counts) so the caller can
+  /// confirm the destructive replace. Returns null if there's nothing on the
+  /// remote yet. Throws [DecryptionException] on a wrong passphrase or a
+  /// corrupted/unreadable backup — local data stays intact in that case.
+  Future<RestorePreview?> prepareRestore() async {
     final creds = await _load();
     final remote = await _github.getFile(creds.config);
-    if (remote == null) return false;
+    if (remote == null) return null;
 
     final plaintext = _crypto.decryptFromEnvelope(
       remote.content,
       creds.passphrase,
     );
-    final export = jsonDecode(plaintext) as Map<String, Object?>;
-    await _repo.importData(export);
 
+    final Map<String, Object?> export;
+    try {
+      export = (jsonDecode(plaintext) as Map).cast<String, Object?>();
+      // The backup must carry a data map, or it isn't safe to import.
+      if (export['data'] is! Map) throw const FormatException('no data');
+    } catch (_) {
+      throw const DecryptionException();
+    }
+
+    final local = await _repo.exportData();
+    final exportedAtRaw = export['exportedAt'];
+    return RestorePreview(
+      export: export,
+      remotePeriods: _rowCount(export, 'periods'),
+      remoteExpenses: _rowCount(export, 'expenses'),
+      localPeriods: _rowCount(local, 'periods'),
+      localExpenses: _rowCount(local, 'expenses'),
+      exportedAt: exportedAtRaw is String
+          ? DateTime.tryParse(exportedAtRaw)
+          : null,
+    );
+  }
+
+  /// Applies a previewed backup: first saves a local safety snapshot of the
+  /// current data (recoverable if the restore turns out wrong), then replaces
+  /// local data with the backup. Returns the snapshot file path.
+  Future<String> applyRestore(RestorePreview preview) async {
+    final snapshotPath = await _writeSnapshot();
+    await _repo.importData(preview.export);
     await _stampLastSync();
-    return true;
+    return snapshotPath;
+  }
+
+  /// Writes the current database to `pre_restore_backup.json` in the app
+  /// documents directory before a restore overwrites it.
+  Future<String> _writeSnapshot() async {
+    final data = await _repo.exportData();
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dir.path, 'pre_restore_backup.json'));
+    await file.writeAsString(jsonEncode(data));
+    return file.path;
+  }
+
+  int _rowCount(Map<String, Object?> export, String table) {
+    final data = export['data'];
+    if (data is! Map) return 0;
+    final rows = data[table];
+    return rows is List ? rows.length : 0;
   }
 
   Future<void> _stampLastSync() =>

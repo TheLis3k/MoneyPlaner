@@ -9,6 +9,7 @@ import '../../state/app_settings.dart';
 import '../../state/planner_state.dart';
 import '../../theme/category_visuals.dart';
 import '../../util/money_format.dart';
+import '../../util/pickers.dart';
 import '../categories/category_editor.dart';
 
 /// Set up a new planning period, or edit the current period's plan when
@@ -177,26 +178,15 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
                     (v == null || v.trim().isEmpty) ? l10n.enterName : null,
               ),
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _DateField(
-                      label: l10n.start,
-                      date: _startDate,
-                      format: dateFmt,
-                      onPick: (d) => setState(() => _startDate = d),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _DateField(
-                      label: l10n.end,
-                      date: _endDate,
-                      format: dateFmt,
-                      onPick: (d) => setState(() => _endDate = d),
-                    ),
-                  ),
-                ],
+              _DateRangeField(
+                label: l10n.dateRange,
+                start: _startDate,
+                end: _endDate,
+                format: dateFmt,
+                onPick: (range) => setState(() {
+                  _startDate = range.start;
+                  _endDate = range.end;
+                }),
               ),
               const SizedBox(height: 12),
             ],
@@ -313,28 +303,28 @@ class _NewPeriodScreenState extends State<NewPeriodScreen> {
   }
 }
 
-class _DateField extends StatelessWidget {
-  const _DateField({
+class _DateRangeField extends StatelessWidget {
+  const _DateRangeField({
     required this.label,
-    required this.date,
+    required this.start,
+    required this.end,
     required this.format,
     required this.onPick,
   });
 
   final String label;
-  final DateTime date;
+  final DateTime start;
+  final DateTime end;
   final DateFormat format;
-  final ValueChanged<DateTime> onPick;
+  final ValueChanged<DateTimeRange> onPick;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: date,
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
+        final picked = await pickDateRange(
+          context,
+          initial: DateTimeRange(start: start, end: end),
         );
         if (picked != null) onPick(picked);
       },
@@ -342,8 +332,9 @@ class _DateField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
+          suffixIcon: const Icon(Icons.date_range_outlined),
         ),
-        child: Text(format.format(date)),
+        child: Text('${format.format(start)} – ${format.format(end)}'),
       ),
     );
   }

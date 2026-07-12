@@ -123,6 +123,25 @@
   "nothingToRestore": "Nie ma jeszcze czego przywracać",
   "restoreWarningTitle": "Przywrócić z chmury?",
   "restoreWarningBody": "To zastąpi wszystkie lokalne dane kopią z chmury.",
+  "restorePreviewCloud": "Kopia w chmurze: {periods} okresów · {expenses} wydatków",
+  "@restorePreviewCloud": {
+    "placeholders": {
+      "periods": { "type": "int" },
+      "expenses": { "type": "int" }
+    }
+  },
+  "restorePreviewLocal": "Twoje dane teraz: {periods} okresów · {expenses} wydatków — zostaną zastąpione",
+  "@restorePreviewLocal": {
+    "placeholders": {
+      "periods": { "type": "int" },
+      "expenses": { "type": "int" }
+    }
+  },
+  "restoreSnapshotNote": "Najpierw zapisujemy kopię bezpieczeństwa Twoich obecnych danych, aby można je było odzyskać, jeśli przywracanie okaże się błędne.",
+  "snapshotKept": "Poprzednie dane zapisano w {path}",
+  "@snapshotKept": {
+    "placeholders": { "path": { "type": "String" } }
+  },
   "syncFailed": "Synchronizacja nie powiodła się: {error}",
   "restore": "Przywróć",
 
@@ -150,6 +169,8 @@
   "history": "Historia",
   "periods": "Okresy",
   "all": "Wszystkie",
+  "dateRange": "Zakres dat",
+  "noMatchingExpenses": "Brak wydatków pasujących do filtrów.",
   "yesterday": "Wczoraj",
   "noPeriodsYet": "Brak okresów.",
   "upcoming": "Nadchodzące",

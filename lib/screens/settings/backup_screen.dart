@@ -63,11 +63,53 @@ class _BackupScreenState extends State<BackupScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final planner = context.read<PlannerState>();
 
+    // Step 1: fetch + decrypt the backup without touching local data, so we
+    // can show the user exactly what will be replaced before they commit.
+    setState(() => _busy = true);
+    RestorePreview? preview;
+    try {
+      preview = await _sync.prepareRestore();
+    } catch (e) {
+      if (mounted) setState(() => _busy = false);
+      messenger.showSnackBar(SnackBar(content: Text(l10n.syncFailed('$e'))));
+      return;
+    }
+    if (mounted) setState(() => _busy = false);
+
+    if (preview == null) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.nothingToRestore)));
+      return;
+    }
+    if (!mounted) return;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.restoreWarningTitle),
-        content: Text(l10n.restoreWarningBody),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.restorePreviewCloud(
+                preview!.remotePeriods,
+                preview.remoteExpenses,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              l10n.restorePreviewLocal(
+                preview.localPeriods,
+                preview.localExpenses,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              l10n.restoreSnapshotNote,
+              style: Theme.of(ctx).textTheme.bodySmall,
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -82,17 +124,14 @@ class _BackupScreenState extends State<BackupScreen> {
     );
     if (confirmed != true) return;
 
+    // Step 2: snapshot the current data, then apply the backup.
     setState(() => _busy = true);
     try {
-      final restored = await _sync.pull();
-      if (restored) await planner.load();
+      final snapshotPath = await _sync.applyRestore(preview);
+      await planner.load();
       await _load();
       messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            restored ? l10n.restoreComplete : l10n.nothingToRestore,
-          ),
-        ),
+        SnackBar(content: Text(l10n.snapshotKept(snapshotPath))),
       );
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(l10n.syncFailed('$e'))));

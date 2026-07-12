@@ -368,6 +368,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'This replaces all local data with the cloud copy.';
 
   @override
+  String restorePreviewCloud(int periods, int expenses) {
+    return 'Cloud backup: $periods periods · $expenses expenses';
+  }
+
+  @override
+  String restorePreviewLocal(int periods, int expenses) {
+    return 'Your data now: $periods periods · $expenses expenses — this will be replaced';
+  }
+
+  @override
+  String get restoreSnapshotNote =>
+      'A safety copy of your current data is saved first, so you can recover if the restore is wrong.';
+
+  @override
+  String snapshotKept(String path) {
+    return 'Previous data saved to $path';
+  }
+
+  @override
   String syncFailed(String error) {
     return 'Sync failed: $error';
   }
@@ -456,6 +475,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get all => 'All';
+
+  @override
+  String get dateRange => 'Date range';
+
+  @override
+  String get noMatchingExpenses => 'No expenses match the filters.';
 
   @override
   String get yesterday => 'Yesterday';

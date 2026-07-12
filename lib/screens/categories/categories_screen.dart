@@ -30,13 +30,17 @@ class CategoriesScreen extends StatelessWidget {
               itemBuilder: (context, i) {
                 final category = categories[i];
                 return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: category.displayColor.withValues(
-                      alpha: 0.2,
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: category.displayColor.withValues(alpha: 0.16),
+                      borderRadius: BorderRadius.circular(11),
                     ),
                     child: Icon(
                       category.displayIcon,
                       color: category.displayColor,
+                      size: 20,
                     ),
                   ),
                   title: Text(category.name),

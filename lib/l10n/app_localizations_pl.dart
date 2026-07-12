@@ -370,6 +370,25 @@ class AppLocalizationsPl extends AppLocalizations {
       'To zastąpi wszystkie lokalne dane kopią z chmury.';
 
   @override
+  String restorePreviewCloud(int periods, int expenses) {
+    return 'Kopia w chmurze: $periods okresów · $expenses wydatków';
+  }
+
+  @override
+  String restorePreviewLocal(int periods, int expenses) {
+    return 'Twoje dane teraz: $periods okresów · $expenses wydatków — zostaną zastąpione';
+  }
+
+  @override
+  String get restoreSnapshotNote =>
+      'Najpierw zapisujemy kopię bezpieczeństwa Twoich obecnych danych, aby można je było odzyskać, jeśli przywracanie okaże się błędne.';
+
+  @override
+  String snapshotKept(String path) {
+    return 'Poprzednie dane zapisano w $path';
+  }
+
+  @override
   String syncFailed(String error) {
     return 'Synchronizacja nie powiodła się: $error';
   }
@@ -460,6 +479,12 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get all => 'Wszystkie';
+
+  @override
+  String get dateRange => 'Zakres dat';
+
+  @override
+  String get noMatchingExpenses => 'Brak wydatków pasujących do filtrów.';
 
   @override
   String get yesterday => 'Wczoraj';

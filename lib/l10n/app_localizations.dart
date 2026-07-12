@@ -764,6 +764,30 @@ abstract class AppLocalizations {
   /// **'This replaces all local data with the cloud copy.'**
   String get restoreWarningBody;
 
+  /// No description provided for @restorePreviewCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud backup: {periods} periods · {expenses} expenses'**
+  String restorePreviewCloud(int periods, int expenses);
+
+  /// No description provided for @restorePreviewLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data now: {periods} periods · {expenses} expenses — this will be replaced'**
+  String restorePreviewLocal(int periods, int expenses);
+
+  /// No description provided for @restoreSnapshotNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A safety copy of your current data is saved first, so you can recover if the restore is wrong.'**
+  String get restoreSnapshotNote;
+
+  /// No description provided for @snapshotKept.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous data saved to {path}'**
+  String snapshotKept(String path);
+
   /// No description provided for @syncFailed.
   ///
   /// In en, this message translates to:
@@ -913,6 +937,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get all;
+
+  /// No description provided for @dateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Date range'**
+  String get dateRange;
+
+  /// No description provided for @noMatchingExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses match the filters.'**
+  String get noMatchingExpenses;
 
   /// No description provided for @yesterday.
   ///
