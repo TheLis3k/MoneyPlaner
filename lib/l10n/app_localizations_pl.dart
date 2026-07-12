@@ -447,6 +447,19 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: ', pominięto $count duplikatu',
+      many: ', pominięto $count duplikatów',
+      few: ', pominięto $count duplikaty',
+      one: ', pominięto 1 duplikat',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get backup => 'Kopia zapasowa';
 
   @override

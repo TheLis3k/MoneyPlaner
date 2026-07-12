@@ -19,15 +19,17 @@ class CsvImporter {
     : _repo = repository ?? PlannerRepository();
 
   /// Imports the default export file in the app documents directory. Returns
-  /// the number of expenses imported, or null if there is no export file.
-  Future<int?> importFromFile() async {
+  /// null if there is no export file.
+  Future<({int imported, int skipped})?> importFromFile() async {
     final dir = await getApplicationDocumentsDirectory();
     return importFromPath(p.join(dir.path, 'money_planner_export.csv'));
   }
 
-  /// Imports a CSV from an explicit path (e.g. one the user picked). Returns
-  /// the number of expenses imported, or null if the file doesn't exist.
-  Future<int?> importFromPath(String path) async {
+  /// Imports a CSV from an explicit path (e.g. one the user picked). Rows that
+  /// already exist (same envelope, amount, day and note) are skipped, so
+  /// re-importing the same file won't create duplicates. Returns the counts of
+  /// imported and skipped rows, or null if the file doesn't exist.
+  Future<({int imported, int skipped})?> importFromPath(String path) async {
     final file = File(path);
     if (!await file.exists()) return null;
 
@@ -35,14 +37,18 @@ class CsvImporter {
         .split(RegExp(r'\r\n|\r|\n'))
         .where((l) => l.trim().isNotEmpty)
         .toList();
-    if (lines.length <= 1) return 0; // header only
+    if (lines.length <= 1) return (imported: 0, skipped: 0); // header only
 
     final periods = {for (final e in await _repo.getPeriods()) e.name: e};
     final categories = {
       for (final c in await _repo.getCategories()) c.name.toLowerCase(): c,
     };
+    // Per-split set of existing expense fingerprints, loaded lazily; new
+    // inserts are added so duplicates within the same file are caught too.
+    final seenBySplit = <int, Set<String>>{};
 
-    var count = 0;
+    var imported = 0;
+    var skipped = 0;
     for (final line in lines.skip(1)) {
       final cols = _parseLine(line);
       if (cols.length < 4) continue;
@@ -69,6 +75,16 @@ class CsvImporter {
         plannedAmount: 0,
       );
 
+      final seen = seenBySplit[split.id!] ??= {
+        for (final e in await _repo.getExpensesForSplit(split.id!))
+          _fingerprint(e.amount, e.date, e.note ?? ''),
+      };
+      final key = _fingerprint(amount, date, note);
+      if (!seen.add(key)) {
+        skipped++;
+        continue; // identical expense already present
+      }
+
       await _repo.insertExpense(
         Expense(
           splitId: split.id!,
@@ -77,10 +93,15 @@ class CsvImporter {
           note: note.isEmpty ? null : note,
         ),
       );
-      count++;
+      imported++;
     }
-    return count;
+    return (imported: imported, skipped: skipped);
   }
+
+  /// A duplicate key at day granularity — the CSV only carries the date, not
+  /// the time, so two rows for the same day/amount/note are considered equal.
+  String _fingerprint(double amount, DateTime date, String note) =>
+      '${amount.toStringAsFixed(2)}|${date.year}-${date.month}-${date.day}|$note';
 
   Future<Period> _ensurePeriod(
     Map<String, Period> cache,

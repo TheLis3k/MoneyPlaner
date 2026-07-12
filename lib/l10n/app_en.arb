@@ -185,6 +185,10 @@
   "@importResult": {
     "placeholders": { "count": { "type": "int" } }
   },
+  "importSkipped": "{count, plural, =1{, skipped 1 duplicate} other{, skipped {count} duplicates}}",
+  "@importSkipped": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "backup": "Backup",
   "about": "About",
   "csvExported": "Exported to {path}",

@@ -443,6 +443,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String importSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: ', skipped $count duplicates',
+      one: ', skipped 1 duplicate',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get backup => 'Backup';
 
   @override

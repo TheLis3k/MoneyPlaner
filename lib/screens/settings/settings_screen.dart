@@ -113,13 +113,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final file = await openFile(acceptedTypeGroups: const [_csvTypeGroup]);
     if (file == null) return; // user cancelled the dialog
 
-    final count = await CsvImporter().importFromPath(file.path);
-    if (count == null) {
+    final result = await CsvImporter().importFromPath(file.path);
+    if (result == null) {
       messenger.showSnackBar(SnackBar(content: Text(l10n.noExportFound)));
       return;
     }
     await planner.load();
-    messenger.showSnackBar(SnackBar(content: Text(l10n.importResult(count))));
+    final message =
+        l10n.importResult(result.imported) +
+        (result.skipped > 0 ? l10n.importSkipped(result.skipped) : '');
+    messenger.showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

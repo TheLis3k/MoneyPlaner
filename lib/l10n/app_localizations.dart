@@ -878,6 +878,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{No expenses to import} =1{Imported 1 expense} other{Imported {count} expenses}}'**
   String importResult(int count);
 
+  /// No description provided for @importSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{, skipped 1 duplicate} other{, skipped {count} duplicates}}'**
+  String importSkipped(int count);
+
   /// No description provided for @backup.
   ///
   /// In en, this message translates to:

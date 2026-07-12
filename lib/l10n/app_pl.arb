@@ -158,6 +158,7 @@
   "importCsv": "Importuj z CSV",
   "noExportFound": "Nie znaleziono pliku eksportu",
   "importResult": "{count, plural, =0{Brak wydatków do zaimportowania} =1{Zaimportowano 1 wydatek} few{Zaimportowano {count} wydatki} many{Zaimportowano {count} wydatków} other{Zaimportowano {count} wydatku}}",
+  "importSkipped": "{count, plural, =1{, pominięto 1 duplikat} few{, pominięto {count} duplikaty} many{, pominięto {count} duplikatów} other{, pominięto {count} duplikatu}}",
   "backup": "Kopia zapasowa",
   "about": "O aplikacji",
   "csvExported": "Wyeksportowano do {path}",
