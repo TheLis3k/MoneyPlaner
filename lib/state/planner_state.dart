@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart' hide Category;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../data/planner_repository.dart';
 import '../models/models.dart';
@@ -11,10 +12,23 @@ import '../models/period_summary.dart';
 /// progress, and the derived totals every screen reads (planned, spent,
 /// remaining, unallocated).
 class PlannerState extends ChangeNotifier {
-  PlannerState({PlannerRepository? repository})
-    : _repo = repository ?? PlannerRepository();
+  PlannerState({PlannerRepository? repository, FlutterSecureStorage? storage})
+    : _repo = repository ?? PlannerRepository(),
+      _storage = storage ?? const FlutterSecureStorage();
+
+  static const _kCurrentPeriod = 'current_period_id';
 
   final PlannerRepository _repo;
+  final FlutterSecureStorage _storage;
+
+  Future<void> _persistCurrent() async {
+    final id = _currentPeriod?.id;
+    if (id == null) {
+      await _storage.delete(key: _kCurrentPeriod);
+    } else {
+      await _storage.write(key: _kCurrentPeriod, value: '$id');
+    }
+  }
 
   bool _loading = true;
   bool get isLoading => _loading;
@@ -61,18 +75,31 @@ class PlannerState extends ChangeNotifier {
     _categories = await _repo.getCategories();
     _recurringRules = await _repo.getRecurringRules();
     _periods = await _repo.getPeriods();
-    _currentPeriod = _periods.isNotEmpty ? _periods.first : null;
+
+    // Restore the last chosen set, falling back to the most recent one.
+    final storedId = int.tryParse(
+      await _storage.read(key: _kCurrentPeriod) ?? '',
+    );
+    Period? chosen;
+    for (final p in _periods) {
+      if (p.id == storedId) {
+        chosen = p;
+        break;
+      }
+    }
+    _currentPeriod = chosen ?? (_periods.isNotEmpty ? _periods.first : null);
     await _refreshProgress();
 
     _loading = false;
     notifyListeners();
   }
 
-  /// Switch the dashboard to another existing period.
+  /// Switch the dashboard to another existing period, remembering the choice.
   Future<void> selectPeriod(int periodId) async {
     final match = _periods.where((p) => p.id == periodId);
     if (match.isEmpty || match.first.id == _currentPeriod?.id) return;
     _currentPeriod = match.first;
+    await _persistCurrent();
     await _refreshProgress();
     notifyListeners();
   }
@@ -116,6 +143,7 @@ class PlannerState extends ChangeNotifier {
 
     _periods = await _repo.getPeriods();
     _currentPeriod = await _repo.getCurrentPeriod();
+    await _persistCurrent();
     await _refreshProgress();
     notifyListeners();
   }
@@ -182,6 +210,7 @@ class PlannerState extends ChangeNotifier {
     _periods = await _repo.getPeriods();
     if (_currentPeriod?.id == periodId) {
       _currentPeriod = _periods.isNotEmpty ? _periods.first : null;
+      await _persistCurrent();
     }
     await _refreshProgress();
     notifyListeners();

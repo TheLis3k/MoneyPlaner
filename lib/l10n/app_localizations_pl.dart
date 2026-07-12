@@ -433,10 +433,10 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get history => 'Historia';
+  String get history => 'Zestawy';
 
   @override
-  String get noPeriodsYet => 'Brak okresów.';
+  String get noPeriodsYet => 'Brak zestawów.';
 
   @override
   String get deletePeriod => 'Usuń okres';

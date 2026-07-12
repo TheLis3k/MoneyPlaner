@@ -174,8 +174,8 @@
     "placeholders": { "category": { "type": "String" } }
   },
 
-  "history": "History",
-  "noPeriodsYet": "No periods yet.",
+  "history": "Sets",
+  "noPeriodsYet": "No sets yet.",
   "deletePeriod": "Delete period",
   "deletePeriodConfirm": "Delete \"{name}\" and all its data?",
   "@deletePeriodConfirm": {

@@ -16,6 +16,15 @@ import '../settings/settings_screen.dart';
 import 'widgets/planned_pie_chart.dart';
 import 'widgets/planned_vs_spent_chart.dart';
 
+/// Opens an envelope's detail (expense) view for a tapped chart element.
+void _openEnvelope(BuildContext context, CategoryProgress progress) {
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (_) => CategoryDetailScreen(splitId: progress.split.id!),
+    ),
+  );
+}
+
 /// Home screen — current-period overview with planned vs. spent per category.
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -130,7 +139,8 @@ class _BottomNav extends StatelessWidget {
             label: l10n.dashboard,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.history),
+            icon: const Icon(Icons.layers_outlined),
+            selectedIcon: const Icon(Icons.layers),
             label: l10n.history,
           ),
           NavigationDestination(
@@ -218,9 +228,16 @@ class _PeriodView extends StatelessWidget {
         _SummaryCard(state: state),
         if (state.progress.isNotEmpty) ...[
           const SizedBox(height: 14),
-          PlannedPieChart(progress: state.progress, spent: state.totalSpent),
+          PlannedPieChart(
+            progress: state.progress,
+            spent: state.totalSpent,
+            onTap: (p) => _openEnvelope(context, p),
+          ),
           const SizedBox(height: 14),
-          PlannedVsSpentChart(progress: state.progress),
+          PlannedVsSpentChart(
+            progress: state.progress,
+            onTap: (p) => _openEnvelope(context, p),
+          ),
         ],
         const SizedBox(height: 20),
         _SectionLabel(l10n.envelopes),

@@ -10,10 +10,18 @@ import '../../../widgets/chart_card.dart';
 /// Donut chart of how the period's income is planned across categories, with
 /// the amount spent called out in the centre.
 class PlannedPieChart extends StatelessWidget {
-  const PlannedPieChart({super.key, required this.progress, this.spent = 0});
+  const PlannedPieChart({
+    super.key,
+    required this.progress,
+    this.spent = 0,
+    this.onTap,
+  });
 
   final List<CategoryProgress> progress;
   final double spent;
+
+  /// Called when a slice or a legend entry is tapped.
+  final void Function(CategoryProgress)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +50,17 @@ class PlannedPieChart extends StatelessWidget {
                   PieChartData(
                     sectionsSpace: 2,
                     centerSpaceRadius: 52,
+                    pieTouchData: PieTouchData(
+                      enabled: true,
+                      touchCallback: (event, response) {
+                        if (event is FlTapUpEvent &&
+                            response?.touchedSection != null) {
+                          final i =
+                              response!.touchedSection!.touchedSectionIndex;
+                          if (i >= 0 && i < items.length) onTap?.call(items[i]);
+                        }
+                      },
+                    ),
                     sections: [
                       for (final p in items)
                         PieChartSectionData(
@@ -82,9 +101,16 @@ class PlannedPieChart extends StatelessWidget {
             runSpacing: 8,
             children: [
               for (final p in items)
-                LegendDot(
-                  color: p.category.displayColor,
-                  label: '${p.category.name} · ${formatZloty(p.planned)}',
+                InkWell(
+                  onTap: onTap == null ? null : () => onTap!(p),
+                  borderRadius: BorderRadius.circular(6),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    child: LegendDot(
+                      color: p.category.displayColor,
+                      label: '${p.category.name} · ${formatZloty(p.planned)}',
+                    ),
+                  ),
                 ),
             ],
           ),

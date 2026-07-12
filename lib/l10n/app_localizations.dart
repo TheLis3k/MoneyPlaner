@@ -881,13 +881,13 @@ abstract class AppLocalizations {
   /// No description provided for @history.
   ///
   /// In en, this message translates to:
-  /// **'History'**
+  /// **'Sets'**
   String get history;
 
   /// No description provided for @noPeriodsYet.
   ///
   /// In en, this message translates to:
-  /// **'No periods yet.'**
+  /// **'No sets yet.'**
   String get noPeriodsYet;
 
   /// No description provided for @deletePeriod.

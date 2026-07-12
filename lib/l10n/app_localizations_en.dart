@@ -431,10 +431,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get history => 'History';
+  String get history => 'Sets';
 
   @override
-  String get noPeriodsYet => 'No periods yet.';
+  String get noPeriodsYet => 'No sets yet.';
 
   @override
   String get deletePeriod => 'Delete period';

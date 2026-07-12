@@ -12,9 +12,12 @@ import '../../../widgets/chart_card.dart';
 /// For every category the left (translucent) bar is the plan and the right
 /// (solid) bar is what's been spent, both tinted with the category's color.
 class PlannedVsSpentChart extends StatelessWidget {
-  const PlannedVsSpentChart({super.key, required this.progress});
+  const PlannedVsSpentChart({super.key, required this.progress, this.onTap});
 
   final List<CategoryProgress> progress;
+
+  /// Called when a category's bar group is tapped.
+  final void Function(CategoryProgress)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +48,12 @@ class PlannedVsSpentChart extends StatelessWidget {
                 maxY: maxY,
                 alignment: BarChartAlignment.spaceAround,
                 barTouchData: BarTouchData(
+                  touchCallback: (event, response) {
+                    if (event is FlTapUpEvent && response?.spot != null) {
+                      final i = response!.spot!.touchedBarGroupIndex;
+                      if (i >= 0 && i < items.length) onTap?.call(items[i]);
+                    }
+                  },
                   touchTooltipData: BarTouchTooltipData(
                     getTooltipColor: (_) => scheme.surfaceContainerHighest,
                     tooltipPadding: const EdgeInsets.symmetric(

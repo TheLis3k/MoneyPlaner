@@ -7,7 +7,6 @@ import '../../models/period_summary.dart';
 import '../../state/planner_state.dart';
 import '../../util/money_format.dart';
 import '../period_setup/new_period_screen.dart';
-import 'period_detail_screen.dart';
 
 /// Read-only list of every planning period with its headline totals, plus the
 /// controls to create and delete periods.
@@ -102,11 +101,11 @@ class _PeriodTile extends StatelessWidget {
           ),
         ],
       ),
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => PeriodDetailScreen(period: summary.period),
-        ),
-      ),
+      // Make the tapped set the active one and return to the main view.
+      onTap: () async {
+        await context.read<PlannerState>().selectPeriod(summary.period.id!);
+        if (context.mounted) Navigator.of(context).pop();
+      },
     );
   }
 

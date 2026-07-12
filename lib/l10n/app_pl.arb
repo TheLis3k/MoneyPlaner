@@ -144,8 +144,8 @@
   "addNew": "Nowa",
   "remainingInCategory": "Pozostało w {category}",
 
-  "history": "Historia",
-  "noPeriodsYet": "Brak okresów.",
+  "history": "Zestawy",
+  "noPeriodsYet": "Brak zestawów.",
   "deletePeriod": "Usuń okres",
   "deletePeriodConfirm": "Usunąć „{name}” i wszystkie jego dane?",
   "periodDeleted": "Okres usunięty",
