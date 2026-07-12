@@ -176,6 +176,10 @@
 
   "history": "Sets",
   "noPeriodsYet": "No sets yet.",
+  "upcoming": "Upcoming",
+  "currentSet": "Current",
+  "earlier": "Earlier",
+  "newExpense": "New expense",
   "deletePeriod": "Delete period",
   "deletePeriodConfirm": "Delete \"{name}\" and all its data?",
   "@deletePeriodConfirm": {

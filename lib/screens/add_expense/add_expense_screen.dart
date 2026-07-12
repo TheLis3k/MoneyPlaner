@@ -149,7 +149,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         centerTitle: true,
-        title: Text(_isEdit ? l10n.editExpense : l10n.addExpense),
+        title: Text(_isEdit ? l10n.editExpense : l10n.newExpense),
       ),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.fromLTRB(

@@ -146,6 +146,10 @@
 
   "history": "Zestawy",
   "noPeriodsYet": "Brak zestawów.",
+  "upcoming": "Nadchodzące",
+  "currentSet": "Bieżący",
+  "earlier": "Wcześniejsze",
+  "newExpense": "Nowy wydatek",
   "deletePeriod": "Usuń okres",
   "deletePeriodConfirm": "Usunąć „{name}” i wszystkie jego dane?",
   "periodDeleted": "Okres usunięty",

@@ -439,6 +439,18 @@ class AppLocalizationsPl extends AppLocalizations {
   String get noPeriodsYet => 'Brak zestawów.';
 
   @override
+  String get upcoming => 'Nadchodzące';
+
+  @override
+  String get currentSet => 'Bieżący';
+
+  @override
+  String get earlier => 'Wcześniejsze';
+
+  @override
+  String get newExpense => 'Nowy wydatek';
+
+  @override
   String get deletePeriod => 'Usuń okres';
 
   @override

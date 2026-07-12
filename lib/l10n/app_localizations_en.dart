@@ -437,6 +437,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPeriodsYet => 'No sets yet.';
 
   @override
+  String get upcoming => 'Upcoming';
+
+  @override
+  String get currentSet => 'Current';
+
+  @override
+  String get earlier => 'Earlier';
+
+  @override
+  String get newExpense => 'New expense';
+
+  @override
   String get deletePeriod => 'Delete period';
 
   @override

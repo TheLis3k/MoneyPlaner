@@ -890,6 +890,30 @@ abstract class AppLocalizations {
   /// **'No sets yet.'**
   String get noPeriodsYet;
 
+  /// No description provided for @upcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcoming;
+
+  /// No description provided for @currentSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get currentSet;
+
+  /// No description provided for @earlier.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier'**
+  String get earlier;
+
+  /// No description provided for @newExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'New expense'**
+  String get newExpense;
+
   /// No description provided for @deletePeriod.
   ///
   /// In en, this message translates to:
