@@ -101,6 +101,35 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     if (mounted) Navigator.of(context).pop(_splitId);
   }
 
+  Future<void> _deleteExpense() async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.deleteExpense),
+        content: Text(l10n.deleteExpenseConfirm(formatZloty(widget.existing!.amount))),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _saving = true);
+    await context.read<PlannerState>().deleteExpense(widget.existing!.id!);
+    if (mounted) Navigator.of(context).pop(_splitId);
+  }
+
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -151,6 +180,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         ),
         centerTitle: true,
         title: Text(_isEdit ? l10n.editExpense : l10n.newExpense),
+        actions: [
+          if (_isEdit)
+            IconButton(
+              tooltip: l10n.deleteExpense,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: _saving ? null : _deleteExpense,
+            ),
+        ],
       ),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.fromLTRB(
