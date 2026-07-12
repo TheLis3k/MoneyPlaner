@@ -18,11 +18,17 @@ class CsvImporter {
   CsvImporter({PlannerRepository? repository})
     : _repo = repository ?? PlannerRepository();
 
-  /// Imports the last exported CSV. Returns the number of expenses imported,
-  /// or null if there is no export file.
+  /// Imports the default export file in the app documents directory. Returns
+  /// the number of expenses imported, or null if there is no export file.
   Future<int?> importFromFile() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 'money_planner_export.csv'));
+    return importFromPath(p.join(dir.path, 'money_planner_export.csv'));
+  }
+
+  /// Imports a CSV from an explicit path (e.g. one the user picked). Returns
+  /// the number of expenses imported, or null if the file doesn't exist.
+  Future<int?> importFromPath(String path) async {
+    final file = File(path);
     if (!await file.exists()) return null;
 
     final lines = (await file.readAsString())

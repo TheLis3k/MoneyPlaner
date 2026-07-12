@@ -11,8 +11,8 @@ class CsvExporter {
   CsvExporter({PlannerRepository? repository})
     : _repo = repository ?? PlannerRepository();
 
-  /// Writes the CSV and returns the file path.
-  Future<String> exportToFile() async {
+  /// Builds the CSV text for every logged expense.
+  Future<String> buildCsv() async {
     final rows = await _repo.expenseExportRows();
 
     final buffer = StringBuffer()..writeln('Period,Category,Amount,Date,Note');
@@ -28,11 +28,20 @@ class CsvExporter {
         ].join(','),
       );
     }
+    return buffer.toString();
+  }
 
+  /// Writes the CSV to a specific path and returns it.
+  Future<String> exportToPath(String path) async {
+    await File(path).writeAsString(await buildCsv());
+    return path;
+  }
+
+  /// Writes the CSV to the default file in the app documents directory
+  /// (used when the platform has no save dialog).
+  Future<String> exportToFile() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dir.path, 'money_planner_export.csv'));
-    await file.writeAsString(buffer.toString());
-    return file.path;
+    return exportToPath(p.join(dir.path, 'money_planner_export.csv'));
   }
 
   /// Escapes a CSV field (wraps in quotes when it contains a comma/quote/newline).

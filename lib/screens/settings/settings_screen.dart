@@ -1,3 +1,4 @@
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -84,10 +85,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // ---- data -----------------------------------------------------------------
 
+  static const _csvTypeGroup = XTypeGroup(label: 'CSV', extensions: ['csv']);
+
   Future<void> _exportCsv() async {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final path = await CsvExporter().exportToFile();
+    String path;
+    try {
+      final location = await getSaveLocation(
+        suggestedName: 'plning_export.csv',
+        acceptedTypeGroups: const [_csvTypeGroup],
+      );
+      if (location == null) return; // user cancelled the dialog
+      path = await CsvExporter().exportToPath(location.path);
+    } on UnimplementedError {
+      // Platform without a save dialog (e.g. Android): use the default file.
+      path = await CsvExporter().exportToFile();
+    }
     messenger.showSnackBar(SnackBar(content: Text(l10n.csvExported(path))));
   }
 
@@ -95,7 +109,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final planner = context.read<PlannerState>();
-    final count = await CsvImporter().importFromFile();
+
+    final file = await openFile(acceptedTypeGroups: const [_csvTypeGroup]);
+    if (file == null) return; // user cancelled the dialog
+
+    final count = await CsvImporter().importFromPath(file.path);
     if (count == null) {
       messenger.showSnackBar(SnackBar(content: Text(l10n.noExportFound)));
       return;
