@@ -1,6 +1,6 @@
 {
   "@@locale": "pl",
-  "appTitle": "Money Planner",
+  "appTitle": "PLNing",
 
   "dashboardEmptyTitle": "Tutaj mieszka Twój budżet kopertowy.",
   "dashboardEmptyBody": "Utwórz zestaw i podziel swój dochód, aby zacząć.",
@@ -136,6 +136,9 @@
   "themeLight": "Jasny",
   "themeAuto": "Auto",
   "exportCsv": "Eksportuj dane (CSV)",
+  "importCsv": "Importuj z CSV",
+  "noExportFound": "Nie znaleziono pliku eksportu",
+  "importResult": "{count, plural, =0{Brak wydatków do zaimportowania} =1{Zaimportowano 1 wydatek} few{Zaimportowano {count} wydatki} many{Zaimportowano {count} wydatków} other{Zaimportowano {count} wydatku}}",
   "backup": "Kopia zapasowa",
   "about": "O aplikacji",
   "csvExported": "Wyeksportowano do {path}",

@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Money Planner';
+  String get appTitle => 'PLNing';
 
   @override
   String get dashboardEmptyTitle => 'Your envelope budget lives here.';
@@ -403,6 +403,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportCsv => 'Export data (CSV)';
+
+  @override
+  String get importCsv => 'Import from CSV';
+
+  @override
+  String get noExportFound => 'No export file found';
+
+  @override
+  String importResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Imported $count expenses',
+      one: 'Imported 1 expense',
+      zero: 'No expenses to import',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get backup => 'Backup';

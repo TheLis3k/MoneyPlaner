@@ -9,7 +9,7 @@ class AppLocalizationsPl extends AppLocalizations {
   AppLocalizationsPl([String locale = 'pl']) : super(locale);
 
   @override
-  String get appTitle => 'Money Planner';
+  String get appTitle => 'PLNing';
 
   @override
   String get dashboardEmptyTitle => 'Tutaj mieszka Twój budżet kopertowy.';
@@ -406,6 +406,26 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get exportCsv => 'Eksportuj dane (CSV)';
+
+  @override
+  String get importCsv => 'Importuj z CSV';
+
+  @override
+  String get noExportFound => 'Nie znaleziono pliku eksportu';
+
+  @override
+  String importResult(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Zaimportowano $count wydatku',
+      many: 'Zaimportowano $count wydatków',
+      few: 'Zaimportowano $count wydatki',
+      one: 'Zaimportowano 1 wydatek',
+      zero: 'Brak wydatków do zaimportowania',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get backup => 'Kopia zapasowa';

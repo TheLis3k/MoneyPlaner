@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Money Planner'**
+  /// **'PLNing'**
   String get appTitle;
 
   /// No description provided for @dashboardEmptyTitle.
@@ -835,6 +835,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export data (CSV)'**
   String get exportCsv;
+
+  /// No description provided for @importCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from CSV'**
+  String get importCsv;
+
+  /// No description provided for @noExportFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No export file found'**
+  String get noExportFound;
+
+  /// No description provided for @importResult.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No expenses to import} =1{Imported 1 expense} other{Imported {count} expenses}}'**
+  String importResult(int count);
 
   /// No description provided for @backup.
   ///

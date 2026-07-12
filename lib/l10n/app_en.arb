@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Money Planner",
+  "appTitle": "PLNing",
 
   "dashboardEmptyTitle": "Your envelope budget lives here.",
   "dashboardEmptyBody": "Create a set and split your income to get started.",
@@ -160,6 +160,12 @@
   "themeLight": "Light",
   "themeAuto": "Auto",
   "exportCsv": "Export data (CSV)",
+  "importCsv": "Import from CSV",
+  "noExportFound": "No export file found",
+  "importResult": "{count, plural, =0{No expenses to import} =1{Imported 1 expense} other{Imported {count} expenses}}",
+  "@importResult": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "backup": "Backup",
   "about": "About",
   "csvExported": "Exported to {path}",

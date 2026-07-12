@@ -5,8 +5,9 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/auth_service.dart';
 import '../../services/csv_exporter.dart';
+import '../../services/csv_importer.dart';
 import '../../state/app_settings.dart';
-import '../categories/categories_screen.dart';
+import '../../state/planner_state.dart';
 import 'backup_screen.dart';
 
 /// App settings: general, appearance, security, data.
@@ -89,43 +90,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     messenger.showSnackBar(SnackBar(content: Text(l10n.csvExported(path))));
   }
 
-  Future<void> _pickFirstDay(AppSettings settings) async {
-    final selected = await showDialog<int>(
-      context: context,
-      builder: (ctx) => SimpleDialog(
-        title: Text(AppLocalizations.of(context).firstDayOfMonth),
-        children: [
-          SizedBox(
-            width: 300,
-            height: 320,
-            child: GridView.count(
-              crossAxisCount: 7,
-              padding: const EdgeInsets.all(12),
-              children: [
-                for (var d = 1; d <= 28; d++)
-                  InkWell(
-                    onTap: () => Navigator.of(ctx).pop(d),
-                    child: Center(
-                      child: Text(
-                        '$d',
-                        style: TextStyle(
-                          fontWeight: d == settings.firstDayOfMonth
-                              ? FontWeight.bold
-                              : null,
-                          color: d == settings.firstDayOfMonth
-                              ? Theme.of(context).colorScheme.primary
-                              : null,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-    if (selected != null) await settings.setFirstDayOfMonth(selected);
+  Future<void> _importCsv() async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final planner = context.read<PlannerState>();
+    final count = await CsvImporter().importFromFile();
+    if (count == null) {
+      messenger.showSnackBar(SnackBar(content: Text(l10n.noExportFound)));
+      return;
+    }
+    await planner.load();
+    messenger.showSnackBar(SnackBar(content: Text(l10n.importResult(count))));
   }
 
   @override
@@ -145,25 +120,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          // ---- General ----
-          _SectionHeader(l10n.general),
-          _Group(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.payments_outlined),
-                title: Text(l10n.currency),
-                trailing: const Text('PLN (zł)'),
-              ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.event_outlined),
-                title: Text(l10n.firstDayOfMonth),
-                trailing: Text('${settings.firstDayOfMonth}'),
-                onTap: () => _pickFirstDay(settings),
-              ),
-            ],
-          ),
-
           // ---- Appearance ----
           _SectionHeader(l10n.appearance),
           _Group(
@@ -250,21 +206,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const Divider(height: 1),
               ListTile(
+                leading: const Icon(Icons.file_upload_outlined),
+                title: Text(l10n.importCsv),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: _importCsv,
+              ),
+              const Divider(height: 1),
+              ListTile(
                 leading: const Icon(Icons.cloud_outlined),
                 title: Text(l10n.backup),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.of(
                   context,
                 ).push(MaterialPageRoute(builder: (_) => const BackupScreen())),
-              ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.grid_view_outlined),
-                title: Text(l10n.manageCategories),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const CategoriesScreen()),
-                ),
               ),
             ],
           ),

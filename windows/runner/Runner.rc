@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.thelis3k" "\0"
-            VALUE "FileDescription", "money_planner" "\0"
+            VALUE "FileDescription", "PLNing" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "money_planner" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.thelis3k. All rights reserved." "\0"
             VALUE "OriginalFilename", "money_planner.exe" "\0"
-            VALUE "ProductName", "money_planner" "\0"
+            VALUE "ProductName", "PLNing" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
