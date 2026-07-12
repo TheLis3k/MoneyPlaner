@@ -16,10 +16,10 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get dashboardEmptyBody =>
-      'Utwórz okres i podziel swój dochód, aby zacząć.';
+      'Utwórz zestaw i podziel swój dochód, aby zacząć.';
 
   @override
-  String get newPeriod => 'Nowy okres';
+  String get newPeriod => 'Nowy zestaw';
 
   @override
   String get addExpense => 'Dodaj wydatek';
@@ -64,7 +64,7 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get periodName => 'Nazwa okresu';
+  String get periodName => 'Nazwa zestawu';
 
   @override
   String get enterName => 'Podaj nazwę';
@@ -76,7 +76,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get end => 'Koniec';
 
   @override
-  String get incomeForPeriod => 'Dochód w tym okresie';
+  String get incomeForPeriod => 'Dochód w tym zestawie';
 
   @override
   String get enterIncome => 'Podaj swój dochód';
@@ -90,7 +90,7 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get createPeriod => 'Utwórz okres';
+  String get createPeriod => 'Utwórz zestaw';
 
   @override
   String get editPlan => 'Edytuj plan';
@@ -100,7 +100,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get noEnvelopesForExpense =>
-      'Ten okres nie ma jeszcze żadnych kopert. Dodaj kategorie do okresu, zanim zapiszesz wydatki.';
+      'Ten zestaw nie ma jeszcze żadnych kopert. Dodaj kategorie do zestawu, zanim zapiszesz wydatki.';
 
   @override
   String get envelope => 'Koperta';
@@ -160,10 +160,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get noCategories => 'Brak kategorii. Dodaj swoją pierwszą.';
 
   @override
-  String get categoryInUse => 'Nie można usunąć kategorii używanej w okresie.';
+  String get categoryInUse => 'Nie można usunąć kategorii używanej w zestawie.';
 
   @override
-  String get period => 'Okres';
+  String get period => 'Zestaw';
 
   @override
   String get expenses => 'Wydatki';
@@ -235,7 +235,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get prefillFromRecurring => 'Wypełnij z reguł';
 
   @override
-  String get applyRecurring => 'Dodaj cykliczne do okresu';
+  String get applyRecurring => 'Dodaj cykliczne do zestawu';
 
   @override
   String recurringApplied(int count) {
@@ -451,7 +451,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get newExpense => 'Nowy wydatek';
 
   @override
-  String get deletePeriod => 'Usuń okres';
+  String get deletePeriod => 'Usuń zestaw';
 
   @override
   String deletePeriodConfirm(String name) {
@@ -459,7 +459,7 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get periodDeleted => 'Okres usunięty';
+  String get periodDeleted => 'Zestaw usunięty';
 
   @override
   String get dashboard => 'Pulpit';

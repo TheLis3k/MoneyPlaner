@@ -3,8 +3,8 @@
   "appTitle": "Money Planner",
 
   "dashboardEmptyTitle": "Your envelope budget lives here.",
-  "dashboardEmptyBody": "Create a period and split your income to get started.",
-  "newPeriod": "New period",
+  "dashboardEmptyBody": "Create a set and split your income to get started.",
+  "newPeriod": "New set",
   "addExpense": "Add expense",
   "envelopes": "Envelopes",
   "noEnvelopes": "No categories allocated yet.",
@@ -29,22 +29,22 @@
     "placeholders": { "amount": { "type": "String" } }
   },
 
-  "periodName": "Period name",
+  "periodName": "Set name",
   "enterName": "Enter a name",
   "start": "Start",
   "end": "End",
-  "incomeForPeriod": "Income for this period",
+  "incomeForPeriod": "Income for this set",
   "enterIncome": "Enter your income",
   "splitAcrossCategories": "Split across categories",
   "overAllocationWarning": "You've allocated {amount} more than your income. You can still continue.",
   "@overAllocationWarning": {
     "placeholders": { "amount": { "type": "String" } }
   },
-  "createPeriod": "Create period",
+  "createPeriod": "Create set",
   "editPlan": "Edit plan",
   "saveChanges": "Save changes",
 
-  "noEnvelopesForExpense": "This period has no envelopes yet. Add categories to the period before logging expenses.",
+  "noEnvelopesForExpense": "This set has no envelopes yet. Add categories to the set before logging expenses.",
   "envelope": "Envelope",
   "pickEnvelope": "Pick an envelope",
   "amount": "Amount",
@@ -65,9 +65,9 @@
   "delete": "Delete",
   "addCategory": "Add category",
   "noCategories": "No categories yet. Add your first one.",
-  "categoryInUse": "Can't delete a category that's used in a period.",
+  "categoryInUse": "Can't delete a category that's used in a set.",
 
-  "period": "Period",
+  "period": "Set",
 
   "expenses": "Expenses",
   "noExpenses": "No expenses in this envelope yet.",
@@ -96,7 +96,7 @@
   "active": "Active",
   "noRecurringRules": "No recurring rules yet. Add templates for regular income or expenses.",
   "prefillFromRecurring": "Pre-fill from recurring",
-  "applyRecurring": "Add recurring to this period",
+  "applyRecurring": "Add recurring to this set",
   "recurringApplied": "{count, plural, =0{Everything is already up to date} =1{Added 1 recurring expense} other{Added {count} recurring expenses}}",
   "@recurringApplied": {
     "placeholders": { "count": { "type": "int" } }
@@ -180,12 +180,12 @@
   "currentSet": "Current",
   "earlier": "Earlier",
   "newExpense": "New expense",
-  "deletePeriod": "Delete period",
+  "deletePeriod": "Delete set",
   "deletePeriodConfirm": "Delete \"{name}\" and all its data?",
   "@deletePeriodConfirm": {
     "placeholders": { "name": { "type": "String" } }
   },
-  "periodDeleted": "Period deleted",
+  "periodDeleted": "Set deleted",
   "dashboard": "Dashboard",
   "periodRange": "{start} – {end}",
   "@periodRange": {

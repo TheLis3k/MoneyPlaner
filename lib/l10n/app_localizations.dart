@@ -113,13 +113,13 @@ abstract class AppLocalizations {
   /// No description provided for @dashboardEmptyBody.
   ///
   /// In en, this message translates to:
-  /// **'Create a period and split your income to get started.'**
+  /// **'Create a set and split your income to get started.'**
   String get dashboardEmptyBody;
 
   /// No description provided for @newPeriod.
   ///
   /// In en, this message translates to:
-  /// **'New period'**
+  /// **'New set'**
   String get newPeriod;
 
   /// No description provided for @addExpense.
@@ -197,7 +197,7 @@ abstract class AppLocalizations {
   /// No description provided for @periodName.
   ///
   /// In en, this message translates to:
-  /// **'Period name'**
+  /// **'Set name'**
   String get periodName;
 
   /// No description provided for @enterName.
@@ -221,7 +221,7 @@ abstract class AppLocalizations {
   /// No description provided for @incomeForPeriod.
   ///
   /// In en, this message translates to:
-  /// **'Income for this period'**
+  /// **'Income for this set'**
   String get incomeForPeriod;
 
   /// No description provided for @enterIncome.
@@ -245,7 +245,7 @@ abstract class AppLocalizations {
   /// No description provided for @createPeriod.
   ///
   /// In en, this message translates to:
-  /// **'Create period'**
+  /// **'Create set'**
   String get createPeriod;
 
   /// No description provided for @editPlan.
@@ -263,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @noEnvelopesForExpense.
   ///
   /// In en, this message translates to:
-  /// **'This period has no envelopes yet. Add categories to the period before logging expenses.'**
+  /// **'This set has no envelopes yet. Add categories to the set before logging expenses.'**
   String get noEnvelopesForExpense;
 
   /// No description provided for @envelope.
@@ -383,13 +383,13 @@ abstract class AppLocalizations {
   /// No description provided for @categoryInUse.
   ///
   /// In en, this message translates to:
-  /// **'Can\'t delete a category that\'s used in a period.'**
+  /// **'Can\'t delete a category that\'s used in a set.'**
   String get categoryInUse;
 
   /// No description provided for @period.
   ///
   /// In en, this message translates to:
-  /// **'Period'**
+  /// **'Set'**
   String get period;
 
   /// No description provided for @expenses.
@@ -527,7 +527,7 @@ abstract class AppLocalizations {
   /// No description provided for @applyRecurring.
   ///
   /// In en, this message translates to:
-  /// **'Add recurring to this period'**
+  /// **'Add recurring to this set'**
   String get applyRecurring;
 
   /// No description provided for @recurringApplied.
@@ -917,7 +917,7 @@ abstract class AppLocalizations {
   /// No description provided for @deletePeriod.
   ///
   /// In en, this message translates to:
-  /// **'Delete period'**
+  /// **'Delete set'**
   String get deletePeriod;
 
   /// No description provided for @deletePeriodConfirm.
@@ -929,7 +929,7 @@ abstract class AppLocalizations {
   /// No description provided for @periodDeleted.
   ///
   /// In en, this message translates to:
-  /// **'Period deleted'**
+  /// **'Set deleted'**
   String get periodDeleted;
 
   /// No description provided for @dashboard.
