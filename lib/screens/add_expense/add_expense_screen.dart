@@ -97,7 +97,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         note: note,
       );
     }
-    if (mounted) Navigator.of(context).pop();
+    // Return the envelope that was saved to, so callers can follow it.
+    if (mounted) Navigator.of(context).pop(_splitId);
   }
 
   Future<void> _pickDate() async {

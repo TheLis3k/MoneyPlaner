@@ -11,6 +11,29 @@ import '../../util/money_format.dart';
 import '../add_expense/add_expense_screen.dart';
 import 'widgets/spending_line_chart.dart';
 
+/// Opens the expense editor and, if the expense was saved to a *different*
+/// envelope than the one being viewed, follows it to that envelope's detail —
+/// so you always land on the category you actually added to.
+Future<void> _openExpense(
+  BuildContext context, {
+  int? initialSplitId,
+  Expense? existing,
+  int? currentSplitId,
+}) async {
+  final from = currentSplitId ?? initialSplitId;
+  final saved = await Navigator.of(context).push<int>(
+    MaterialPageRoute(
+      builder: (_) =>
+          AddExpenseScreen(initialSplitId: initialSplitId, existing: existing),
+    ),
+  );
+  if (saved != null && saved != from && context.mounted) {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => CategoryDetailScreen(splitId: saved)),
+    );
+  }
+}
+
 /// Detail for a single envelope: planned/spent/remaining plus the list of
 /// expenses logged against it, each of which can be deleted.
 class CategoryDetailScreen extends StatelessWidget {
@@ -33,11 +56,7 @@ class CategoryDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(progress.category.name)),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => AddExpenseScreen(initialSplitId: splitId),
-          ),
-        ),
+        onPressed: () => _openExpense(context, initialSplitId: splitId),
         icon: const Icon(Icons.add),
         label: Text(l10n.addExpense),
       ),
@@ -186,8 +205,10 @@ class _ExpenseTile extends StatelessWidget {
         tooltip: l10n.deleteExpense,
         onPressed: () => _confirmDelete(context),
       ),
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => AddExpenseScreen(existing: expense)),
+      onTap: () => _openExpense(
+        context,
+        existing: expense,
+        currentSplitId: expense.splitId,
       ),
     );
   }
