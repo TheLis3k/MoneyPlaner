@@ -8,6 +8,7 @@ import '../../services/csv_exporter.dart';
 import '../../services/csv_importer.dart';
 import '../../state/app_settings.dart';
 import '../../state/planner_state.dart';
+import '../categories/categories_screen.dart';
 import 'backup_screen.dart';
 
 /// App settings: general, appearance, security, data.
@@ -219,6 +220,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () => Navigator.of(
                   context,
                 ).push(MaterialPageRoute(builder: (_) => const BackupScreen())),
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.grid_view_outlined),
+                title: Text(l10n.manageCategories),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const CategoriesScreen()),
+                ),
               ),
             ],
           ),
