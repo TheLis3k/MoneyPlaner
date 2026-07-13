@@ -31,6 +31,31 @@ Delete a category mid-period? Its unspent allocation flows back into an
 **Unallocated** pool, ready to re-split — while its past expenses stay on record
 so your history is never distorted.
 
+## 📱 Screenshots
+
+<div align="center">
+<table>
+<tr>
+<td align="center" width="25%">
+<img src="docs/screenshots/dashboard.jpg" width="220" alt="Dashboard: income, planned total, unallocated amount, and a donut chart of the split"><br>
+Dashboard
+</td>
+<td align="center" width="25%">
+<img src="docs/screenshots/plan-vs-expenses.jpg" width="220" alt="Plan vs spent bar chart and the envelope list"><br>
+Plan vs. spent
+</td>
+<td align="center" width="25%">
+<img src="docs/screenshots/category-detail.jpg" width="220" alt="Category detail: planned/spent/remaining, spending-over-time chart, expense list"><br>
+Category detail
+</td>
+<td align="center" width="25%">
+<img src="docs/screenshots/history.jpg" width="220" alt="History: filterable log of all expenses"><br>
+History
+</td>
+</tr>
+</table>
+</div>
+
 ## 🎯 Features
 
 | | |
@@ -40,6 +65,7 @@ so your history is never distorted.
 | 🔁 **Recurring rules** | Templates for regular income/expenses (rent, salary) that pre-fill new periods |
 | 🧮 **Unallocated tracking** | Always know how much income is still free to assign |
 | 📌 **Persistent balance bar** | Remaining balance stays visible on every screen |
+| 🧭 **Bottom navigation** | Pulpit (dashboard) · Historia · Okresy · Ustawienia, one tap away |
 | 🕓 **History** | Read-only summaries and charts for past periods |
 | 🔐 **Local security** | PIN + biometric unlock (`local_auth`) |
 | ☁️ **Encrypted sync** | Push an **AES-encrypted** blob to a private GitHub repo — the cloud only ever sees ciphertext |
@@ -65,7 +91,16 @@ lib/
 ├── widgets/
 │   └── remaining_balance_bar.dart   # shared sticky balance bar
 └── screens/
-    └── dashboard/            # current-period overview
+    ├── dashboard/            # current-period overview + bottom nav (Pulpit)
+    ├── history/              # read-only log of past expenses (Historia)
+    ├── periods/              # period switcher (Okresy)
+    ├── settings/             # security, sync, theme (Ustawienia)
+    ├── period_setup/         # new period + income split
+    ├── categories/           # category CRUD, icon/color picker
+    ├── category_detail/      # planned/spent/remaining + charts per category
+    ├── add_expense/          # log spending against a category
+    ├── recurring/            # recurring income/expense rule templates
+    └── lock/                 # PIN/biometric lock gate
 ```
 
 ### Data model
@@ -136,11 +171,11 @@ flutter test
 - [x] **Phase 3** — Recurring rules: templates, pre-fill new periods, auto-generate expenses
 - [x] **Phase 4** — PIN (salted PBKDF2) + biometric lock screen, Settings security section
 - [x] **Phase 5** — Encrypted GitHub sync: AES + PBKDF2, push/pull `data.enc` via the GitHub API
-- [x] **Phase 6** — Read-only History view (past periods + charts), navigation drawer, edge-case polish
+- [x] **Phase 6** — Read-only History view (past periods + charts), bottom navigation bar, edge-case polish
 
 🎉 **All planned phases are complete.**
 
-**Extras already in:** custom categories with icon/color picker · full Polish localization (`pl`) with zł currency · period switcher · navigation drawer.
+**Extras already in:** custom categories with icon/color picker · full Polish localization (`pl`) with zł currency · period switcher · bottom navigation bar.
 
 ## 🤝 Contributing
 
